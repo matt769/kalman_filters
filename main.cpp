@@ -8,6 +8,7 @@
 
 #include "simple_kf.h"
 #include "kalman_filter.h"
+#include "system.h"
 
 Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
   return x;
@@ -17,6 +18,7 @@ int main() {
 
   const Eigen::Vector2d z(1.0, 2.0);
 
+  ////////////////////////////////////////////////////////////////////
   std::cout << "Simple kalman filter\n";
   kf0::KalmanFilter skf;
   for (int i = 0; i < 10; i++) {
@@ -26,6 +28,7 @@ int main() {
     std::cout << "Update: " << skf.Update(z * (double) i).transpose() << "\n\n";
   }
 
+  ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 1\n";
 
   kf1::KalmanFilter<4> kf1;
@@ -88,7 +91,18 @@ int main() {
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
     std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
   }
-  std::cout << "NOT THE SAME AS KF1 - INVESTIGATE\n";
+  std::cout << "NOT THE SAME AS KF1 - INVESTIGATE\n\n";
+
+  ////////////////////////////////////////////////////////////////////
+
+//  systems::SimpleSystem system;
+  kf3::KalmanFilter<4, 2, systems::SimpleSystem> kf_3;
+  kf_3.Predict(Q);
+  kf_3.Update(z, R);
+  std::cout << "KF3: " << kf_3.GetState().transpose() << "\n\n";
+
+
+
 
 
   return 0;
