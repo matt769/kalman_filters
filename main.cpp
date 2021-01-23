@@ -16,12 +16,13 @@ Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
 
 int main() {
 
+  const size_t iterations = 2;
   const Eigen::Vector2d z(1.0, 2.0);
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Simple kalman filter\n";
   kf0::KalmanFilter skf;
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     std::cout << "Predict: " << skf.Predict().transpose() << '\n';
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
@@ -52,7 +53,7 @@ int main() {
   Eigen::Matrix4d Q = Eigen::Matrix4d::Identity() * 2.0;
   Eigen::Matrix2d R = Eigen::Matrix2d::Identity();
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     kf1.Predict(process, Q);
     std::cout << "Predict: " << kf1.GetState().transpose() << '\n';
@@ -83,7 +84,7 @@ int main() {
 
   kf2::KalmanFilter<4, 2> kf2(process_model_2, measurement_model_2);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     kf2.Predict(Q);
     std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
