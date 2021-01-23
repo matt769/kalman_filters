@@ -146,13 +146,8 @@ class KalmanFilter {
 
 
 namespace kf3 {
-// How to template if I want to write
-// KalmanFiler<systems::SimpleSystem> kf;  ?
-// Or should I be doing
-// KalmanFilter kf(system);
 
 // Remove N and M, take from System instead
-
 template<size_t N, size_t M, typename System>
 class KalmanFilter {
 public:
