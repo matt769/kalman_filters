@@ -27,20 +27,19 @@ using ProcessModel = std::function<Eigen::Matrix<double, N, 1>(const Eigen::Matr
 template<size_t N, size_t M>
 using MeasurementModel = std::function<Eigen::Matrix<double, M, 1>(const Eigen::Matrix<double, N, 1>&)>;
 
-
 template<size_t N>
 class KalmanFilter {
-  public:
-    KalmanFilter() {};
-    void Predict(ProcessModel<N> process, const Eigen::Matrix<double, N, N>& process_noise) {
-        const Eigen::Matrix<double, N, N>& Q = process_noise;
+ public:
+  KalmanFilter() {};
+  void Predict(ProcessModel<N> process, const Eigen::Matrix<double, N, N>& process_noise) {
+    const Eigen::Matrix<double, N, N>& Q = process_noise;
 //        std::cout << "Predict\n";
 //        state_.x = process(state_.x);
-        // How to update covariance?
-        // Easy if process were passed as a matrix
-        // P_ = F_ * P_ * F_.transpose() + Q_;
+    // How to update covariance?
+    // Easy if process were passed as a matrix
+    // P_ = F_ * P_ * F_.transpose() + Q_;
 
-        // Appy process model
+    // Appy process model
 //        Eigen::Matrix<double, N, N> FP;
 //        for (size_t col_idx = 0; col_idx < N; ++col_idx) {
 //            FP.col(col_idx) = process(state_.P.col(col_idx));
@@ -50,39 +49,39 @@ class KalmanFilter {
 //            FPF.row(row_idx) = process(FP.row(row_idx));
 //        }
 
-        // Or extract F matrix from the function
-        Eigen::Matrix<double, N, N> I = Eigen::Matrix<double, N, N>::Identity();
-        Eigen::Matrix<double, N, N> F;
-        for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-            F.col(col_idx) = process(I.col(col_idx));
-        }
+    // Or extract F matrix from the function
+    Eigen::Matrix<double, N, N> I = Eigen::Matrix<double, N, N>::Identity();
+    Eigen::Matrix<double, N, N> F;
+    for (size_t col_idx = 0; col_idx < N; ++col_idx) {
+      F.col(col_idx) = process(I.col(col_idx));
+    }
 //        std::cout << F << '\n';
-        state_.x = F * state_.x;
-        state_.P = F * state_.P * F.transpose() + Q;
+    state_.x = F * state_.x;
+    state_.P = F * state_.P * F.transpose() + Q;
 //        std::cout << "x\n";
 //        std::cout << state_.x.transpose() << "\n\n";
 //        std::cout << "P\n";
 //        std::cout << state_.P << "\n\n";
 
-    };
-    template<size_t M>
-    void Update(MeasurementModel<N, M> measurement_model, const Eigen::Matrix<double, M, 1>& measurement,
-                const Eigen::Matrix<double, M, M>& measurement_noise) {
-        const Eigen::Matrix<double, M, M>& R = measurement_noise;
+  };
+  template<size_t M>
+  void Update(MeasurementModel<N, M> measurement_model, const Eigen::Matrix<double, M, 1>& measurement,
+              const Eigen::Matrix<double, M, M>& measurement_noise) {
+    const Eigen::Matrix<double, M, M>& R = measurement_noise;
 
-        Eigen::Matrix<double, N, N> I = Eigen::Matrix<double, N, N>::Identity();
-        Eigen::Matrix<double, M, N> H; // measurement model as matrix
-        for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-            H.col(col_idx) = measurement_model(I.col(col_idx));
-        }
+    Eigen::Matrix<double, N, N> I = Eigen::Matrix<double, N, N>::Identity();
+    Eigen::Matrix<double, M, N> H; // measurement model as matrix
+    for (size_t col_idx = 0; col_idx < N; ++col_idx) {
+      H.col(col_idx) = measurement_model(I.col(col_idx));
+    }
 //        std::cout << "Update\n";
 
-       Eigen::Matrix<double, M, 1> z_hat = H * state_.x;
-        Eigen::Matrix<double, M, 1> y = measurement - z_hat;
-        Eigen::Matrix<double, M, M> S = H * state_.P * H.transpose() + R;
-        Eigen::Matrix<double, N, M> K = state_.P * H.transpose() * S.inverse();
+    Eigen::Matrix<double, M, 1> z_hat = H * state_.x;
+    Eigen::Matrix<double, M, 1> y = measurement - z_hat;
+    Eigen::Matrix<double, M, M> S = H * state_.P * H.transpose() + R;
+    Eigen::Matrix<double, N, M> K = state_.P * H.transpose() * S.inverse();
 
-        state_.x = state_.x + K * y;
+    state_.x = state_.x + K * y;
 //        std::cout << "K\n";
 //        std::cout << K << "\n\n";
 //        std::cout << "H\n";
@@ -91,7 +90,7 @@ class KalmanFilter {
 //        std::cout << K * H << "\n\n";
 //        std::cout << "I - K * H\n";
 //        std::cout << Eigen::Matrix<double, N, N>::Identity() - K * H << "\n\n";
-        state_.P = (Eigen::Matrix<double, N, N>::Identity() - K * H) * state_.P;
+    state_.P = (Eigen::Matrix<double, N, N>::Identity() - K * H) * state_.P;
 
 //        std::cout << "z_hat\n";
 //        std::cout << z_hat.transpose() << "\n\n";
@@ -107,23 +106,23 @@ class KalmanFilter {
 //        std::cout << state_.x.transpose() << "\n\n";
 //        std::cout << "P\n";
 //        std::cout << state_.P << "\n\n";
-    };
+  };
 
-    Eigen::Matrix<double, N, 1> GetState() const {
-        return state_.x;
-    };
-    Eigen::Matrix<double, N, N> GetCov() const {
-        return state_.P;
-    };
-    void SetState(const Eigen::Matrix<double, N, 1>& new_state) {
-        state_.x = new_state;
-    };
-    void SetCov(const Eigen::Matrix<double, N, N>& new_cov) {
-        state_.P = new_cov;
-    };
+  Eigen::Matrix<double, N, 1> GetState() const {
+    return state_.x;
+  };
+  Eigen::Matrix<double, N, N> GetCov() const {
+    return state_.P;
+  };
+  void SetState(const Eigen::Matrix<double, N, 1>& new_state) {
+    state_.x = new_state;
+  };
+  void SetCov(const Eigen::Matrix<double, N, N>& new_cov) {
+    state_.P = new_cov;
+  };
 
-  private:
-    kf::State<N> state_;
+ private:
+  kf::State<N> state_;
 };
 
 } // namespace kf1
@@ -134,64 +133,64 @@ namespace kf2 {
 
 template<size_t N, size_t M>
 class KalmanFilter {
-public:
-    using ProcessModel = std::function<Eigen::Matrix<double, N, 1>(const Eigen::Matrix<double, N, 1>&)>;
-    using MeasurementModel = std::function<Eigen::Matrix<double, M, 1>(const Eigen::Matrix<double, N, 1>&)>;
+ public:
+  using ProcessModel = std::function<Eigen::Matrix<double, N, 1>(const Eigen::Matrix<double, N, 1>&)>;
+  using MeasurementModel = std::function<Eigen::Matrix<double, M, 1>(const Eigen::Matrix<double, N, 1>&)>;
 
-    KalmanFilter(ProcessModel process_model, MeasurementModel measurement_model)
-    : process_model_(process_model), measurement_model_(measurement_model) {
-        // Convert process model function into matrix
-        const Eigen::Matrix<double, N, N> IF = Eigen::Matrix<double, N, N>::Identity();
-        Eigen::Matrix<double, N, N> F;
-        for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-            F.col(col_idx) = process_model_(IF.col(col_idx));
-        }
-        // Convert measurement model function into matrix
-        const Eigen::Matrix<double, N, N> IH = Eigen::Matrix<double, N, N>::Identity();
-        Eigen::Matrix<double, M, N> H; // measurement model as matrix
-        for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-            H.col(col_idx) = measurement_model_(IH.col(col_idx));
-        }
-    };
+  KalmanFilter(ProcessModel process_model, MeasurementModel measurement_model)
+      : process_model_(process_model), measurement_model_(measurement_model) {
+    // Convert process model function into matrix
+    const Eigen::Matrix<double, N, N> IF = Eigen::Matrix<double, N, N>::Identity();
+    Eigen::Matrix<double, N, N> F;
+    for (size_t col_idx = 0; col_idx < N; ++col_idx) {
+      F.col(col_idx) = process_model_(IF.col(col_idx));
+    }
+    // Convert measurement model function into matrix
+    const Eigen::Matrix<double, N, N> IH = Eigen::Matrix<double, N, N>::Identity();
+    Eigen::Matrix<double, M, N> H; // measurement model as matrix
+    for (size_t col_idx = 0; col_idx < N; ++col_idx) {
+      H.col(col_idx) = measurement_model_(IH.col(col_idx));
+    }
+  };
 
-    void Predict(const Eigen::Matrix<double, N, N>& process_noise) {
-        const Eigen::Matrix<double, N, N>& Q = process_noise;
+  void Predict(const Eigen::Matrix<double, N, N>& process_noise) {
+    const Eigen::Matrix<double, N, N>& Q = process_noise;
 
-        state_.x = F_ * state_.x;
-        state_.P = F_ * state_.P * F_.transpose() + Q;
-    };
+    state_.x = F_ * state_.x;
+    state_.P = F_ * state_.P * F_.transpose() + Q;
+  };
 
-    void Update(const Eigen::Matrix<double, M, 1>& measurement,
-                const Eigen::Matrix<double, M, M>& measurement_noise) {
-        const Eigen::Matrix<double, M, M>& R = measurement_noise;
-        Eigen::Matrix<double, M, 1> z_hat = H_ * state_.x;
-        Eigen::Matrix<double, M, 1> y = measurement - z_hat;
-        Eigen::Matrix<double, M, M> S = H_ * state_.P * H_.transpose() + R;
-        Eigen::Matrix<double, N, M> K = state_.P * H_.transpose() * S.inverse();
+  void Update(const Eigen::Matrix<double, M, 1>& measurement,
+              const Eigen::Matrix<double, M, M>& measurement_noise) {
+    const Eigen::Matrix<double, M, M>& R = measurement_noise;
+    Eigen::Matrix<double, M, 1> z_hat = H_ * state_.x;
+    Eigen::Matrix<double, M, 1> y = measurement - z_hat;
+    Eigen::Matrix<double, M, M> S = H_ * state_.P * H_.transpose() + R;
+    Eigen::Matrix<double, N, M> K = state_.P * H_.transpose() * S.inverse();
 
-        state_.x = state_.x + K * y;
-        state_.P = (Eigen::Matrix<double, N, N>::Identity() - K * H_) * state_.P;
-    };
+    state_.x = state_.x + K * y;
+    state_.P = (Eigen::Matrix<double, N, N>::Identity() - K * H_) * state_.P;
+  };
 
-    Eigen::Matrix<double, N, 1> GetState() const {
-        return state_.x;
-    };
-    Eigen::Matrix<double, N, N> GetCov() const {
-        return state_.P;
-    };
-    void SetState(const Eigen::Matrix<double, N, 1>& new_state) {
-        state_.x = new_state;
-    };
-    void SetCov(const Eigen::Matrix<double, N, N>& new_cov) {
-        state_.P = new_cov;
-    };
+  Eigen::Matrix<double, N, 1> GetState() const {
+    return state_.x;
+  };
+  Eigen::Matrix<double, N, N> GetCov() const {
+    return state_.P;
+  };
+  void SetState(const Eigen::Matrix<double, N, 1>& new_state) {
+    state_.x = new_state;
+  };
+  void SetCov(const Eigen::Matrix<double, N, N>& new_cov) {
+    state_.P = new_cov;
+  };
 
-private:
-    kf::State<N> state_;
-    ProcessModel process_model_;
-    Eigen::Matrix<double, N, N> F_; // process_model_ as matrix
-    MeasurementModel measurement_model_;
-    Eigen::Matrix<double, M, N> H_; // measurement_model_ as matrix
+ private:
+  kf::State<N> state_;
+  ProcessModel process_model_;
+  Eigen::Matrix<double, N, N> F_; // process_model_ as matrix
+  MeasurementModel measurement_model_;
+  Eigen::Matrix<double, M, N> H_; // measurement_model_ as matrix
 };
 
 } // namespace kf2
