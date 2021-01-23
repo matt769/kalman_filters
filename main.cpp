@@ -93,7 +93,6 @@ int main() {
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
     std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
   }
-  std::cout << "NOT THE SAME AS KF1 - INVESTIGATE\n\n";
 
   ////////////////////////////////////////////////////////////////////
 
