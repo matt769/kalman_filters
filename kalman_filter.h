@@ -223,8 +223,6 @@ public:
   using StateSizeMatrix = Eigen::Matrix<double, System::kStateSize, System::kStateSize>;
   using MeasurementSizeVector = Eigen::Matrix<double, System::kMeasurementSize, 1>;
   using MeasurementSizeMatrix = Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>;
-  using ProcessModel = std::function<Eigen::Matrix<double, System::kStateSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
-  using MeasurementModel = std::function<Eigen::Matrix<double, System::kMeasurementSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
 
   KalmanFilter()
   {
@@ -274,9 +272,7 @@ public:
 
 private:
   kf::State<System::kStateSize> state_;
-  ProcessModel process_model_;
   StateSizeMatrix F_; // process_model_ as matrix
-  MeasurementModel measurement_model_;
   Eigen::Matrix<double, System::kMeasurementSize, System::kStateSize> H_; // measurement_model_ as matrix
   System system_;
 };
