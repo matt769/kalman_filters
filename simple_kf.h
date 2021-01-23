@@ -29,7 +29,7 @@ private:
     Eigen::Matrix<double, 2, 4> H_;
     Eigen::Matrix<double, 2, 2> R_;
 //    Eigen::Matrix<double, 2, 1> z; // measurement
-    static constexpr double dt = 1.0;
+    static constexpr double dt = 0.1;
 
     // Not required as member variables, but might want to inspect so let's keep
     Eigen::Matrix<double, 2, 1> z_hat_;
