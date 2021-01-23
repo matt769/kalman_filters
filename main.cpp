@@ -16,7 +16,7 @@ Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
 
 int main() {
 
-  const size_t iterations = 2;
+  const size_t iterations = 3;
   const Eigen::Vector2d z(1.0, 2.0);
 
   ////////////////////////////////////////////////////////////////////
