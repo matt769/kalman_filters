@@ -80,12 +80,8 @@ int main() {
     kf2::KalmanFilter<4, 2> kf2(process_model_2, measurement_model_2);
 
     for (int i = 0; i < 10; i++) {
-//        std::cout << "Iteration: " << i << '\n';
         kf2.Predict(Q);
-//        std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
         kf2.Update(z * (double)i, R);
-//        std::cout << "Measurement: " << (z * (double)i).transpose() << "\n";
-//        std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
     }
     std::cout << "Update: " << kf1.GetState().transpose() << "\n\n";
 
