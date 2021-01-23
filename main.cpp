@@ -95,8 +95,8 @@ int main() {
   }
 
   ////////////////////////////////////////////////////////////////////
+  std::cout << "Templated kalman filter 3\n";
 
-//  systems::SimpleSystem system;
   kf3::KalmanFilter<4, 2, systems::SimpleSystem> kf_3;
   kf_3.SetCov(Eigen::Matrix4d::Identity() * 100.0);
 
@@ -107,6 +107,21 @@ int main() {
     kf_3.Update(z * (double) i, R);
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
     std::cout << "Update: " << kf_3.GetState().transpose() << "\n\n";
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  std::cout << "Templated kalman filter 4\n";
+
+  kf4::KalmanFilter<systems::SimpleSystem> kf_4;
+  kf_4.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf_4.Predict(Q);
+    std::cout << "Predict: " << kf_4.GetState().transpose() << '\n';
+    kf_4.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf_4.GetState().transpose() << "\n\n";
   }
 
 

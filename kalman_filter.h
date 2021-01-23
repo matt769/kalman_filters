@@ -213,4 +213,73 @@ private:
 
 } // namespace kf3
 
+namespace kf4 {
+
+// Add some typedefs
+template<typename System>
+class KalmanFilter {
+public:
+  using StateSizeVector = Eigen::Matrix<double, System::kStateSize, 1>;
+  using StateSizeMatrix = Eigen::Matrix<double, System::kStateSize, System::kStateSize>;
+  using ProcessModel = std::function<Eigen::Matrix<double, System::kStateSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
+  using MeasurementModel = std::function<Eigen::Matrix<double, System::kMeasurementSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
+
+  KalmanFilter()
+  {
+    // Convert process model function into matrix
+    const Eigen::Matrix<double, System::kStateSize, System::kStateSize> IF = Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity();
+    for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
+      F_.col(col_idx) = system_.processModel(IF.col(col_idx));
+    }
+    // Convert measurement model function into matrix
+    const Eigen::Matrix<double, System::kStateSize, System::kStateSize> IH = Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity();
+    for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
+      H_.col(col_idx) = system_.measurementModel(IH.col(col_idx));
+    }
+  };
+
+  void Predict(const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& process_noise) {
+    const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& Q = process_noise;
+
+    state_.x = F_ * state_.x;
+    state_.P = F_ * state_.P * F_.transpose() + Q;
+  };
+
+  void Update(const Eigen::Matrix<double, System::kMeasurementSize, 1>& measurement,
+              const Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>& measurement_noise) {
+    const Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>& R = measurement_noise;
+    Eigen::Matrix<double, System::kMeasurementSize, 1> z_hat = H_ * state_.x;
+    Eigen::Matrix<double, System::kMeasurementSize, 1> y = measurement - z_hat;
+    Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize> S = H_ * state_.P * H_.transpose() + R;
+    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = state_.P * H_.transpose() * S.inverse();
+
+    state_.x = state_.x + K * y;
+    state_.P = (Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity() - K * H_) * state_.P;
+  };
+
+  Eigen::Matrix<double, System::kStateSize, 1> GetState() const {
+    return state_.x;
+  };
+  Eigen::Matrix<double, System::kStateSize, System::kStateSize> GetCov() const {
+    return state_.P;
+  };
+  void SetState(const Eigen::Matrix<double, System::kStateSize, 1>& new_state) {
+    state_.x = new_state;
+  };
+  void SetCov(const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& new_cov) {
+    state_.P = new_cov;
+  };
+
+private:
+  kf::State<System::kStateSize> state_;
+  ProcessModel process_model_;
+  Eigen::Matrix<double, System::kStateSize, System::kStateSize> F_; // process_model_ as matrix
+  MeasurementModel measurement_model_;
+  Eigen::Matrix<double, System::kMeasurementSize, System::kStateSize> H_; // measurement_model_ as matrix
+  System system_;
+};
+
+} // namespace kf4
+
+
 #endif //SIMPLE_UKF_KALMAN_FILTER_H
