@@ -221,6 +221,7 @@ class KalmanFilter {
 public:
   using StateSizeVector = Eigen::Matrix<double, System::kStateSize, 1>;
   using StateSizeMatrix = Eigen::Matrix<double, System::kStateSize, System::kStateSize>;
+  using MeasurementSizeVector = Eigen::Matrix<double, System::kMeasurementSize, 1>;
   using ProcessModel = std::function<Eigen::Matrix<double, System::kStateSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
   using MeasurementModel = std::function<Eigen::Matrix<double, System::kMeasurementSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
 
