@@ -37,6 +37,7 @@ class KalmanFilter {
 
     state_.x = F * state_.x;
     state_.P = F * state_.P * F.transpose() + Q;
+    std::cout << state_.P << "\n\n";
   };
   template<size_t M>
   void Update(MeasurementModel<N, M> measurement_model, const Eigen::Matrix<double, M, 1>& measurement,
@@ -107,6 +108,7 @@ class KalmanFilter {
 
     state_.x = F_ * state_.x;
     state_.P = F_ * state_.P * F_.transpose() + Q;
+    std::cout << state_.P << "\n\n";
   };
 
   void Update(const Eigen::Matrix<double, M, 1>& measurement,

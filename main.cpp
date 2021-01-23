@@ -83,6 +83,7 @@ int main() {
   };
 
   kf2::KalmanFilter<4, 2> kf2(process_model_2, measurement_model_2);
+  kf2.SetCov(Eigen::Matrix4d::Identity() * 100.0);
 
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
@@ -98,6 +99,7 @@ int main() {
 
 //  systems::SimpleSystem system;
   kf3::KalmanFilter<4, 2, systems::SimpleSystem> kf_3;
+  kf_3.SetCov(Eigen::Matrix4d::Identity() * 100.0);
   kf_3.Predict(Q);
   kf_3.Update(z, R);
   std::cout << "KF3: " << kf_3.GetState().transpose() << "\n\n";
