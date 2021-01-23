@@ -222,59 +222,60 @@ public:
   using StateSizeVector = Eigen::Matrix<double, System::kStateSize, 1>;
   using StateSizeMatrix = Eigen::Matrix<double, System::kStateSize, System::kStateSize>;
   using MeasurementSizeVector = Eigen::Matrix<double, System::kMeasurementSize, 1>;
+  using MeasurementSizeMatrix = Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>;
   using ProcessModel = std::function<Eigen::Matrix<double, System::kStateSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
   using MeasurementModel = std::function<Eigen::Matrix<double, System::kMeasurementSize, 1>(const Eigen::Matrix<double, System::kStateSize, 1>&)>;
 
   KalmanFilter()
   {
     // Convert process model function into matrix
-    const Eigen::Matrix<double, System::kStateSize, System::kStateSize> IF = Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity();
+    const StateSizeMatrix IF = StateSizeMatrix::Identity();
     for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
       F_.col(col_idx) = system_.processModel(IF.col(col_idx));
     }
     // Convert measurement model function into matrix
-    const Eigen::Matrix<double, System::kStateSize, System::kStateSize> IH = Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity();
+    const StateSizeMatrix IH = StateSizeMatrix::Identity();
     for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
       H_.col(col_idx) = system_.measurementModel(IH.col(col_idx));
     }
   };
 
-  void Predict(const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& process_noise) {
-    const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& Q = process_noise;
+  void Predict(const StateSizeMatrix& process_noise) {
+    const StateSizeMatrix& Q = process_noise;
 
     state_.x = F_ * state_.x;
     state_.P = F_ * state_.P * F_.transpose() + Q;
   };
 
-  void Update(const Eigen::Matrix<double, System::kMeasurementSize, 1>& measurement,
-              const Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>& measurement_noise) {
-    const Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>& R = measurement_noise;
-    Eigen::Matrix<double, System::kMeasurementSize, 1> z_hat = H_ * state_.x;
-    Eigen::Matrix<double, System::kMeasurementSize, 1> y = measurement - z_hat;
-    Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize> S = H_ * state_.P * H_.transpose() + R;
+  void Update(const MeasurementSizeVector& measurement,
+              const MeasurementSizeMatrix& measurement_noise) {
+    const MeasurementSizeMatrix& R = measurement_noise;
+    MeasurementSizeVector z_hat = H_ * state_.x;
+    MeasurementSizeVector y = measurement - z_hat;
+    MeasurementSizeMatrix S = H_ * state_.P * H_.transpose() + R;
     Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = state_.P * H_.transpose() * S.inverse();
 
     state_.x = state_.x + K * y;
-    state_.P = (Eigen::Matrix<double, System::kStateSize, System::kStateSize>::Identity() - K * H_) * state_.P;
+    state_.P = (StateSizeMatrix::Identity() - K * H_) * state_.P;
   };
 
-  Eigen::Matrix<double, System::kStateSize, 1> GetState() const {
+  StateSizeVector GetState() const {
     return state_.x;
   };
-  Eigen::Matrix<double, System::kStateSize, System::kStateSize> GetCov() const {
+  StateSizeMatrix GetCov() const {
     return state_.P;
   };
-  void SetState(const Eigen::Matrix<double, System::kStateSize, 1>& new_state) {
+  void SetState(const StateSizeVector& new_state) {
     state_.x = new_state;
   };
-  void SetCov(const Eigen::Matrix<double, System::kStateSize, System::kStateSize>& new_cov) {
+  void SetCov(const StateSizeMatrix& new_cov) {
     state_.P = new_cov;
   };
 
 private:
   kf::State<System::kStateSize> state_;
   ProcessModel process_model_;
-  Eigen::Matrix<double, System::kStateSize, System::kStateSize> F_; // process_model_ as matrix
+  StateSizeMatrix F_; // process_model_ as matrix
   MeasurementModel measurement_model_;
   Eigen::Matrix<double, System::kMeasurementSize, System::kStateSize> H_; // measurement_model_ as matrix
   System system_;
