@@ -91,15 +91,13 @@ class KalmanFilter {
       : process_model_(process_model), measurement_model_(measurement_model) {
     // Convert process model function into matrix
     const Eigen::Matrix<double, N, N> IF = Eigen::Matrix<double, N, N>::Identity();
-    Eigen::Matrix<double, N, N> F;
     for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-      F.col(col_idx) = process_model_(IF.col(col_idx));
+      F_.col(col_idx) = process_model_(IF.col(col_idx));
     }
     // Convert measurement model function into matrix
     const Eigen::Matrix<double, N, N> IH = Eigen::Matrix<double, N, N>::Identity();
-    Eigen::Matrix<double, M, N> H;
     for (size_t col_idx = 0; col_idx < N; ++col_idx) {
-      H.col(col_idx) = measurement_model_(IH.col(col_idx));
+      H_.col(col_idx) = measurement_model_(IH.col(col_idx));
     }
   };
 
