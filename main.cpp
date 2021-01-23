@@ -99,11 +99,15 @@ int main() {
 //  systems::SimpleSystem system;
   kf3::KalmanFilter<4, 2, systems::SimpleSystem> kf_3;
   kf_3.SetCov(Eigen::Matrix4d::Identity() * 100.0);
-  kf_3.Predict(Q);
-  kf_3.Update(z, R);
-  std::cout << "KF3: " << kf_3.GetState().transpose() << "\n\n";
 
-
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf_3.Predict(Q);
+    std::cout << "Predict: " << kf_3.GetState().transpose() << '\n';
+    kf_3.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf_3.GetState().transpose() << "\n\n";
+  }
 
 
 
