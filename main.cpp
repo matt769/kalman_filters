@@ -18,7 +18,7 @@ int main() {
   const Eigen::Vector2d z(1.0, 2.0);
 
   std::cout << "Simple kalman filter\n";
-  kf::SimpleKalmanFilter skf;
+  kf0::KalmanFilter skf;
   for (int i = 0; i < 10; i++) {
     std::cout << "Iteration: " << i << '\n';
     std::cout << "Predict: " << skf.Predict().transpose() << '\n';

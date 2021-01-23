@@ -9,11 +9,9 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+namespace kf0 {
 
-// TODO want a nice way of charting or tracking state?
-namespace kf {
-
-SimpleKalmanFilter::SimpleKalmanFilter() {
+KalmanFilter::KalmanFilter() {
   // State, position (x, y) and velocity (x, y)
   x_.setZero();
   // Initialise covariance with high values
@@ -35,37 +33,36 @@ SimpleKalmanFilter::SimpleKalmanFilter() {
   // Measurement noise
   R_.setIdentity(); // TODO placeholder
 
-//    std::cout << "F: " << '\n';
-//    std::cout << F_ << '\n';
-//    std::cout << "x: " << '\n';
-//    std::cout << x_.transpose() << '\n';
-//    std::cout << "P: " << '\n';
-//    std::cout << P_ << '\n';
-//    std::cout << "Q: " << '\n';
-//    std::cout << Q_ << '\n';
-//    std::cout << "H: " << '\n';
-//    std::cout << H_ << '\n';
-//    std::cout << "R: " << '\n';
-//    std::cout << R_ << "\n\n";
-
-
+  //    std::cout << "F: " << '\n';
+  //    std::cout << F_ << '\n';
+  //    std::cout << "x: " << '\n';
+  //    std::cout << x_.transpose() << '\n';
+  //    std::cout << "P: " << '\n';
+  //    std::cout << P_ << '\n';
+  //    std::cout << "Q: " << '\n';
+  //    std::cout << Q_ << '\n';
+  //    std::cout << "H: " << '\n';
+  //    std::cout << H_ << '\n';
+  //    std::cout << "R: " << '\n';
+  //    std::cout << R_ << "\n\n";
 }
 
-Eigen::Matrix<double, 4, 1> SimpleKalmanFilter::Predict() {
+Eigen::Matrix<double, 4, 1> KalmanFilter::Predict() {
   x_ = F_ * x_;
   P_ = F_ * P_ * F_.transpose() + Q_;
 
-//    std::cout << "Predict\n";
-//    std::cout << "F: " << '\n';
-//    std::cout << F_ << '\n';
-//    std::cout << "x: " << '\n';
-//    std::cout << x_.transpose() << '\n';
-//    std::cout << "P: " << '\n';
-//    std::cout << P_ << "\n\n";
+  //    std::cout << "Predict\n";
+  //    std::cout << "F: " << '\n';
+  //    std::cout << F_ << '\n';
+  //    std::cout << "x: " << '\n';
+  //    std::cout << x_.transpose() << '\n';
+  //    std::cout << "P: " << '\n';
+  //    std::cout << P_ << "\n\n";
   return x_;
 }
 
-Eigen::Matrix<double, 4, 1> SimpleKalmanFilter::Update(const Eigen::Matrix<double, 2, 1>& z) {
+Eigen::Matrix<double, 4, 1>
+KalmanFilter::Update(const Eigen::Matrix<double, 2, 1> &z) {
   z_hat_ = H_ * x_;
   y_ = z - z_hat_;
   S_ = H_ * P_ * H_.transpose() + R_;
@@ -73,23 +70,23 @@ Eigen::Matrix<double, 4, 1> SimpleKalmanFilter::Update(const Eigen::Matrix<doubl
   x_ = x_ + K_ * y_;
   P_ = (Eigen::Matrix4d::Identity() - K_ * H_) * P_;
 
-//    std::cout << "Update\n";
-//    std::cout << "z: " << '\n';
-//    std::cout << z.transpose() << '\n';
-//    std::cout << "z_hat: " << '\n';
-//    std::cout << z_hat_.transpose() << '\n';
-//    std::cout << "y: " << '\n';
-//    std::cout << y_.transpose() << '\n';
-//    std::cout << "S: " << '\n';
-//    std::cout << S_ << '\n';
-//    std::cout << "K: " << '\n';
-//    std::cout << K_ << '\n';
-//    std::cout << "x: " << '\n';
-//    std::cout << x_.transpose() << '\n';
-//    std::cout << "P: " << '\n';
-//    std::cout << P_ << "\n\n";
+  //    std::cout << "Update\n";
+  //    std::cout << "z: " << '\n';
+  //    std::cout << z.transpose() << '\n';
+  //    std::cout << "z_hat: " << '\n';
+  //    std::cout << z_hat_.transpose() << '\n';
+  //    std::cout << "y: " << '\n';
+  //    std::cout << y_.transpose() << '\n';
+  //    std::cout << "S: " << '\n';
+  //    std::cout << S_ << '\n';
+  //    std::cout << "K: " << '\n';
+  //    std::cout << K_ << '\n';
+  //    std::cout << "x: " << '\n';
+  //    std::cout << x_.transpose() << '\n';
+  //    std::cout << "P: " << '\n';
+  //    std::cout << P_ << "\n\n";
 
   return x_;
 }
 
-}
+} // namespace kf0
