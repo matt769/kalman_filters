@@ -1,0 +1,107 @@
+//
+// Created by matt on 24/01/2021.
+//
+
+#ifndef KALMAN_FILTERS_UNSCENTED_KF_H_
+#define KALMAN_FILTERS_UNSCENTED_KF_H_
+
+#include <functional>
+
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Cholesky>
+
+#include "state.h"
+#include "system.h"
+
+namespace experimental {
+namespace ukf1 {
+
+template<typename System>
+class UnscentedKalmanFilter {
+ public:
+  using StateSizeVector = Eigen::Matrix<double, System::kStateSize, 1>;
+  using StateSizeMatrix = Eigen::Matrix<double, System::kStateSize, System::kStateSize>;
+  using MeasurementSizeVector = Eigen::Matrix<double, System::kMeasurementSize, 1>;
+  using MeasurementSizeMatrix = Eigen::Matrix<double, System::kMeasurementSize, System::kMeasurementSize>;
+
+  UnscentedKalmanFilter() {
+    CalculateWeights();
+  };
+
+  void Predict(const StateSizeMatrix& process_noise) {
+    const StateSizeMatrix& Q = process_noise;
+
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
+
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP; // transformed sigma points
+    for (size_t idx = 1; idx < kNumSigma; idx += 1) {
+      TSP.row(idx) = System::processModel(SP.row(idx));
+    }
+
+    state_.x = TSP.transpose() * W; // (weighted) mean of transformed sigma points
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP_minus_mean = TSP.rowwise() - state_.x.transpose();
+    state_.P = TSP_minus_mean.transpose() * TSP_minus_mean;
+    // find nicer way to do this? possibly using array operations
+    for (size_t idx = 0; idx < System::kStateSize; ++idx) {
+      state_.P.row(idx) *= W(idx); // will this apply weights in the way I want or will I need to do before the mult above??
+    }
+
+    // giving non-zero outputs for the first prediction
+  };
+
+  void Update(const MeasurementSizeVector& measurement,
+              const MeasurementSizeMatrix& measurement_noise) {
+    const MeasurementSizeMatrix& R = measurement_noise;
+
+
+//    MeasurementSizeVector z_hat = System::measurementModel(state_.x);
+//    MeasurementSizeVector y = measurement - z_hat;
+//    MeasurementSizeMatrix S = JH * state_.P * JH.transpose() + R;
+//    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = state_.P * JH.transpose() * S.inverse();
+//    state_.x = state_.x + K * y;
+//    state_.P = (StateSizeMatrix::Identity() - K * JH) * state_.P;
+  };
+
+  StateSizeVector GetState() const { return state_.x; };
+  StateSizeMatrix GetCov() const { return state_.P; };
+  void SetState(const StateSizeVector& new_state) { state_.x = new_state; };
+  void SetCov(const StateSizeMatrix& new_cov) { state_.P = new_cov; };
+
+ private:
+  kf::State<System::kStateSize> state_;
+  static constexpr size_t kNumSigma = 2 * System::kStateSize + 1;
+  Eigen::Matrix<double, kNumSigma, 1> W; // Sigma point weights
+  static constexpr double lambda = 1.0; // TODO review
+
+  void CalculateWeights() {
+    W(0) = lambda / (System::kStateSize + lambda);
+    for (size_t i = 1; i < kNumSigma; i++) {
+      W(i) = 1.0 / (2 * (System::kStateSize + lambda));
+      W(i+1) = 1.0 / (2 * (System::kStateSize + lambda));
+    }
+  };
+
+  Eigen::Matrix<double, kNumSigma, System::kStateSize> CalculateSigmaPoints() const {
+    // Use LLT decomposition to get the square root, https://eigen.tuxfamily.org/dox/classEigen_1_1LLT.html
+    StateSizeMatrix P_mod = (static_cast<double>(System::kStateSize) + lambda) * state_.P;
+    Eigen::LLT<StateSizeMatrix> llt_of_P_mod(P_mod);
+    StateSizeMatrix L = llt_of_P_mod.matrixL();
+
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> SigmaPoints;
+    SigmaPoints.row(0) = state_.x;
+    for (size_t idx = 1; idx < kNumSigma; idx += 2) {
+      // "for a root of the form P=LL', the columns of L are used." [1] (as opposed to P=L'L)
+      SigmaPoints.row(idx) = (state_.x + L.col(idx)).transpose();
+      SigmaPoints.row(idx + 1) = (state_.x + L.col(idx + 1)).transpose();
+    }
+    return SigmaPoints;
+  }
+};
+
+} // namespace ekf1
+} // namespace experimental
+
+// 1. A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators, Julier, Uhlman, Durrant-Whyte
+
+#endif //KALMAN_FILTERS_UNSCENTED_KF_H_

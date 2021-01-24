@@ -9,6 +9,7 @@
 #include "simple_kf.h"
 #include "standard_kf.h"
 #include "extended_kf.h"
+#include "unscented_kf.h"
 #include "system.h"
 #include "numeric_differentiation.h"
 
@@ -189,6 +190,24 @@ int main() {
 
  // velocity is estimated correctly after a few iterations
  // why doesn't heading work out?
+
+  ////////////////////////////////////////////////////////////////////
+  std::cout << "Unscented kalman filter 1\n";
+
+  experimental::ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
+  ukf_1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    ukf_1.Predict(Q);
+    std::cout << "Predict: " << ukf_1.GetState().transpose() << '\n';
+    ukf_1.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << ukf_1.GetState().transpose() << "\n\n";
+  }
+
+
+
 
   return 0;
 }
