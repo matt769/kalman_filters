@@ -155,23 +155,40 @@ int main() {
 
 
   ////////////////////////////////////////////////////////////////////
-  std::cout << "EKF 1\n";
+  std::cout << "EKF 1 (with linear system) \n";
 
   experimental::ekf1::ExtendedKalmanFilter<systems::SimpleSystem> ekf_1;
   ekf_1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     ekf_1.Predict(Q);
-    std::cout << "Predict: " << kf_5.GetState().transpose() << '\n';
+    std::cout << "Predict: " << ekf_1.GetState().transpose() << '\n';
     ekf_1.Update(z * (double) i, R);
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
     std::cout << "Update: " << ekf_1.GetState().transpose() << "\n\n";
   }
 
+  ////////////////////////////////////////////////////////////////////
+  std::cout << "EKF 1 (with non-linear system) \n";
 
+  experimental::ekf1::ExtendedKalmanFilter<systems::NonLinearSystem> ekf_2;
+  systems::NonLinearSystem::ProcessNoise Q_nl = systems::NonLinearSystem::ProcessNoise::Identity() * 10.0;
+  systems::NonLinearSystem::MeasurementNoise R_nl = systems::NonLinearSystem::MeasurementNoise::Identity() * 1.0;
 
+//  systems::NonLinearSystem::MeasurementVector z_nl =
 
+  ekf_2.SetCov(Q_nl);
+  for (int i = 0; i < 100; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    ekf_2.Predict(Q_nl);
+    std::cout << "Predict: " << ekf_2.GetState().transpose() << '\n';
+    ekf_2.Update(z, R_nl);
+    std::cout << "Measurement: " << z.transpose() << "\n";
+    std::cout << "Update: " << ekf_2.GetState().transpose() << "\n\n";
+  }
 
+ // velocity is estimated correctly after a few iterations
+ // why doesn't heading work out?
 
   return 0;
 }
