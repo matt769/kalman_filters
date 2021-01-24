@@ -35,7 +35,7 @@ class UnscentedKalmanFilter {
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
 
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP; // transformed sigma points
-    for (size_t idx = 1; idx < kNumSigma; idx += 1) {
+    for (size_t idx = 0; idx < kNumSigma; ++idx) {
       TSP.row(idx) = System::processModel(SP.row(idx));
     }
 
@@ -46,7 +46,7 @@ class UnscentedKalmanFilter {
     for (size_t idx = 0; idx < System::kStateSize; ++idx) {
       state_.P.row(idx) *= W(idx); // will this apply weights in the way I want or will I need to do before the mult above??
     }
-
+    state_.P += Q;
     // giving non-zero outputs for the first prediction
   };
 
@@ -90,10 +90,10 @@ class UnscentedKalmanFilter {
 
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SigmaPoints;
     SigmaPoints.row(0) = state_.x;
-    for (size_t idx = 1; idx < kNumSigma; idx += 2) {
+    for (size_t idx = 0; idx < System::kStateSize; ++idx) {
       // "for a root of the form P=LL', the columns of L are used." [1] (as opposed to P=L'L)
-      SigmaPoints.row(idx) = (state_.x + L.col(idx)).transpose();
-      SigmaPoints.row(idx + 1) = (state_.x + L.col(idx + 1)).transpose();
+      SigmaPoints.row(2 * idx + 1) = (state_.x + L.col(idx)).transpose();
+      SigmaPoints.row(2 * idx + 1 + 1) = (state_.x - L.col(idx)).transpose();
     }
     return SigmaPoints;
   }

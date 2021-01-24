@@ -179,7 +179,7 @@ int main() {
 //  systems::NonLinearSystem::MeasurementVector z_nl =
 
   ekf_2.SetCov(Q_nl);
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     ekf_2.Predict(Q_nl);
     std::cout << "Predict: " << ekf_2.GetState().transpose() << '\n';
