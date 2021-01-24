@@ -124,6 +124,22 @@ int main() {
     std::cout << "Update: " << kf_4.GetState().transpose() << "\n\n";
   }
 
+  ////////////////////////////////////////////////////////////////////
+  std::cout << "Another system\n";
+
+  const Eigen::Vector3d z3(1.0, 2.0, 0.5);
+  Eigen::Matrix<double, 6, 6> Q3 = Eigen::Matrix<double, 6, 6>::Identity() * 2.0;
+  Eigen::Matrix3d R3 = Eigen::Matrix3d::Identity();
+
+  kf4::KalmanFilter<systems::AnotherSystem> kf_5;
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf_5.Predict(Q3);
+    std::cout << "Predict: " << kf_5.GetState().transpose() << '\n';
+    kf_5.Update(z3 * (double) i, R3);
+    std::cout << "Measurement: " << (z3 * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf_5.GetState().transpose() << "\n\n";
+  }
 
 
   return 0;
