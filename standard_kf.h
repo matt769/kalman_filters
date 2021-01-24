@@ -274,7 +274,6 @@ private:
   kf::State<System::kStateSize> state_;
   StateSizeMatrix F_; // process_model_ as matrix
   Eigen::Matrix<double, System::kMeasurementSize, System::kStateSize> H_; // measurement_model_ as matrix
-  System system_;
 };
 
 } // namespace kf4
