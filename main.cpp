@@ -8,7 +8,9 @@
 
 #include "simple_kf.h"
 #include "standard_kf.h"
+#include "extended_kf.h"
 #include "system.h"
+#include "numeric_differentiation.h"
 
 Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
   return x;
@@ -140,6 +142,35 @@ int main() {
     std::cout << "Measurement: " << (z3 * (double) i).transpose() << "\n";
     std::cout << "Update: " << kf_5.GetState().transpose() << "\n\n";
   }
+
+  ////////////////////////////////////////////////////////////////////
+
+  Eigen::Vector4d current_state = Eigen::Vector4d::Zero();
+
+  using SS = systems::SimpleSystem;
+  Eigen::Matrix<double, SS::kStateSize, SS::kStateSize> JF = numeric_differentiation::CalculateJacobian<SS::kStateSize, SS::kStateSize>(current_state, SS::processModel);
+  std::cout << JF << "\n\n";
+  Eigen::Matrix<double, SS::kMeasurementSize, SS::kStateSize> JH = numeric_differentiation::CalculateJacobian<SS::kStateSize, SS::kMeasurementSize>(current_state, SS::measurementModel);
+  std::cout << JH << "\n\n";
+
+
+  ////////////////////////////////////////////////////////////////////
+  std::cout << "EKF 1\n";
+
+  experimental::ekf1::ExtendedKalmanFilter<systems::SimpleSystem> ekf_1;
+  ekf_1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    ekf_1.Predict(Q);
+    std::cout << "Predict: " << kf_5.GetState().transpose() << '\n';
+    ekf_1.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << ekf_1.GetState().transpose() << "\n\n";
+  }
+
+
+
+
 
 
   return 0;
