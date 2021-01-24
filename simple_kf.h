@@ -17,6 +17,10 @@ public:
   KalmanFilter();
   Eigen::Matrix<double, 4, 1> Predict();
   Eigen::Matrix<double, 4, 1> Update(const Eigen::Matrix<double, 2, 1> &z);
+  Eigen::Matrix<double, 4, 1> GetState() const { return x_; };
+  Eigen::Matrix<double, 4, 4> GetCov() const { return P_; };
+  void SetState(const Eigen::Matrix<double, 4, 1>& new_state) { x_ = new_state; };
+  void SetCov(const Eigen::Matrix<double, 4, 4>& new_cov) { P_ = new_cov; };
 
 private:
   Eigen::Matrix<double, 4, 1> x_; // px, py, vx, vy
