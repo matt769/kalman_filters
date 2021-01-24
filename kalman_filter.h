@@ -2,8 +2,8 @@
 // Created by matt on 22/01/2021.
 //
 
-#ifndef SIMPLE_UKF_KALMAN_FILTER_H
-#define SIMPLE_UKF_KALMAN_FILTER_H
+#ifndef KALMAN_FILTERS_KALMAN_FILTER_H
+#define KALMAN_FILTERS_KALMAN_FILTER_H
 
 #include <functional>
 
@@ -280,4 +280,4 @@ private:
 } // namespace kf4
 
 
-#endif //SIMPLE_UKF_KALMAN_FILTER_H
+#endif //KALMAN_FILTERS_KALMAN_FILTER_H

@@ -2,8 +2,8 @@
 // Created by matt on 20/01/2021.
 //
 
-#ifndef SIMPLE_UKF_SIMPLE_KF_H
-#define SIMPLE_UKF_SIMPLE_KF_H
+#ifndef KALMAN_FILTERS_SIMPLE_KF_H
+#define KALMAN_FILTERS_SIMPLE_KF_H
 
 #include <Eigen/Core>
 
@@ -39,4 +39,4 @@ private:
 
 } // namespace kf0
 
-#endif // SIMPLE_UKF_SIMPLE_KF_H
+#endif // KALMAN_FILTERS_SIMPLE_KF_H

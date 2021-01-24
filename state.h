@@ -2,8 +2,8 @@
 // Created by matt on 20/01/2021.
 //
 
-#ifndef SIMPLE_UKF_STATE_H
-#define SIMPLE_UKF_STATE_H
+#ifndef KALMAN_FILTERS_STATE_H
+#define KALMAN_FILTERS_STATE_H
 
 #include <Eigen/Core>
 
@@ -30,4 +30,4 @@ struct State {
 
 } // namespace kf
 
-#endif //SIMPLE_UKF_STATE_H
+#endif //KALMAN_FILTERS_STATE_H

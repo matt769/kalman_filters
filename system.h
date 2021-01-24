@@ -2,8 +2,8 @@
 // Created by matt on 23/01/2021.
 //
 
-#ifndef SIMPLE_UKF_SYSTEM_H_
-#define SIMPLE_UKF_SYSTEM_H_
+#ifndef KALMAN_FILTERS_SYSTEM_H_
+#define KALMAN_FILTERS_SYSTEM_H_
 
 #include <cstddef>
 #include <functional>
@@ -73,4 +73,4 @@ public:
 
 } // namespace systems
 
-#endif // SIMPLE_UKF_SYSTEM_H_
+#endif // KALMAN_FILTERS_SYSTEM_H_
