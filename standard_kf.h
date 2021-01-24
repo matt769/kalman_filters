@@ -229,12 +229,12 @@ public:
     // Convert process model function into matrix
     const StateSizeMatrix IF = StateSizeMatrix::Identity();
     for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
-      F_.col(col_idx) = system_.processModel(IF.col(col_idx));
+      F_.col(col_idx) = System::processModel(IF.col(col_idx));
     }
     // Convert measurement model function into matrix
     const StateSizeMatrix IH = StateSizeMatrix::Identity();
     for (size_t col_idx = 0; col_idx < System::kStateSize; ++col_idx) {
-      H_.col(col_idx) = system_.measurementModel(IH.col(col_idx));
+      H_.col(col_idx) = System::measurementModel(IH.col(col_idx));
     }
   };
 

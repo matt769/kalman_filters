@@ -20,7 +20,7 @@ public:
   using StateVector = kf::State<kStateSize>::StateVector;
   using StateMatrix = kf::State<kStateSize>::CovMatrix;
 
-  StateVector processModel(const StateVector &x) {
+  static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
     F(0, 2) = 0.1; // px' = px + vx*dt
     F(1, 3) = 0.1; // py' = py + vy*dt
@@ -32,7 +32,7 @@ public:
   using MeasurementNoise =
       Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
 
-  MeasurementVector measurementModel(const StateVector &x) {
+  static MeasurementVector measurementModel(const StateVector &x) {
     Eigen::Matrix<double, 2, 4> H = Eigen::Matrix<double, 2, 4>::Zero();
     // Measure position only
     H(0, 0) = 1.0;
@@ -47,7 +47,7 @@ public:
   using StateVector = kf::State<kStateSize>::StateVector;
   using StateMatrix = kf::State<kStateSize>::CovMatrix;
 
-  StateVector processModel(const StateVector &x) {
+  static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
     F(0, 3) = 0.1; // px' = px + vx*dt
     F(1, 4) = 0.1; // py' = py + vy*dt
@@ -60,7 +60,7 @@ public:
   using MeasurementNoise =
   Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
 
-  MeasurementVector measurementModel(const StateVector &x) {
+  static MeasurementVector measurementModel(const StateVector &x) {
     Eigen::Matrix<double, kMeasurementSize, kStateSize> H = Eigen::Matrix<double, kMeasurementSize, kStateSize>::Zero();
     // Measure position only
     H(0, 0) = 1.0;
