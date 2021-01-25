@@ -19,17 +19,23 @@ Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
 
 int main() {
 
-  const int iterations = 3;
+  const int iterations = 2;
   const Eigen::Vector2d z(1.0, 2.0);
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Simple kalman filter\n";
   kf0::KalmanFilter skf;
+  skf.SetCov(Eigen::Matrix4d::Identity());
+  std::cout << "Intial state:\n";
+  std::cout << skf.GetState().transpose() << '\n';
+  std::cout << skf.GetCov() << '\n';
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     std::cout << "Predict: " << skf.Predict().transpose() << '\n';
+    std::cout << skf.GetCov() << '\n';
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << skf.Update(z * (double) i).transpose() << "\n\n";
+    std::cout << "Update: " << skf.Update(z * (double) i).transpose() << "\n";
+    std::cout << skf.GetCov() << "\n\n";
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -56,14 +62,18 @@ int main() {
   Eigen::Matrix4d Q = Eigen::Matrix4d::Identity() * 2.0;
   Eigen::Matrix2d R = Eigen::Matrix2d::Identity();
 
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    kf1.Predict(process, Q);
-    std::cout << "Predict: " << kf1.GetState().transpose() << '\n';
-    kf1.Update<2>(measurement_model, z * (double) i, R);
-    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << kf1.GetState().transpose() << "\n\n";
-  }
+//  std::cout << kf1.GetState().transpose() << '\n';
+//  std::cout << kf1.GetCov() << '\n';
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    kf1.Predict(process, Q);
+//    std::cout << "Predict: " << kf1.GetState().transpose() << '\n';
+//    std::cout << kf1.GetCov() << '\n';
+//    kf1.Update<2>(measurement_model, z * (double) i, R);
+//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << kf1.GetState().transpose() << "\n\n";
+//    std::cout << kf1.GetCov() << '\n';
+//  }
 
   ////////////////////////////////////////////////////////////////////
 
@@ -88,14 +98,14 @@ int main() {
   kf2::KalmanFilter<4, 2> kf2(process_model_2, measurement_model_2);
   kf2.SetCov(Eigen::Matrix4d::Identity() * 100.0);
 
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    kf2.Predict(Q);
-    std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
-    kf2.Update(z * (double) i, R);
-    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
-  }
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    kf2.Predict(Q);
+//    std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
+//    kf2.Update(z * (double) i, R);
+//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
+//  }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 3\n";
@@ -103,14 +113,14 @@ int main() {
   kf3::KalmanFilter<4, 2, systems::SimpleSystem> kf_3;
   kf_3.SetCov(Eigen::Matrix4d::Identity() * 100.0);
 
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    kf_3.Predict(Q);
-    std::cout << "Predict: " << kf_3.GetState().transpose() << '\n';
-    kf_3.Update(z * (double) i, R);
-    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << kf_3.GetState().transpose() << "\n\n";
-  }
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    kf_3.Predict(Q);
+//    std::cout << "Predict: " << kf_3.GetState().transpose() << '\n';
+//    kf_3.Update(z * (double) i, R);
+//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << kf_3.GetState().transpose() << "\n\n";
+//  }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 4\n";
@@ -118,14 +128,14 @@ int main() {
   kf4::KalmanFilter<systems::SimpleSystem> kf_4;
   kf_4.SetCov(Eigen::Matrix4d::Identity() * 100.0);
 
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    kf_4.Predict(Q);
-    std::cout << "Predict: " << kf_4.GetState().transpose() << '\n';
-    kf_4.Update(z * (double) i, R);
-    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << kf_4.GetState().transpose() << "\n\n";
-  }
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    kf_4.Predict(Q);
+//    std::cout << "Predict: " << kf_4.GetState().transpose() << '\n';
+//    kf_4.Update(z * (double) i, R);
+//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << kf_4.GetState().transpose() << "\n\n";
+//  }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Another system\n";
@@ -134,15 +144,15 @@ int main() {
   Eigen::Matrix<double, 6, 6> Q3 = Eigen::Matrix<double, 6, 6>::Identity() * 2.0;
   Eigen::Matrix3d R3 = Eigen::Matrix3d::Identity();
 
-  kf4::KalmanFilter<systems::AnotherSystem> kf_5;
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    kf_5.Predict(Q3);
-    std::cout << "Predict: " << kf_5.GetState().transpose() << '\n';
-    kf_5.Update(z3 * (double) i, R3);
-    std::cout << "Measurement: " << (z3 * (double) i).transpose() << "\n";
-    std::cout << "Update: " << kf_5.GetState().transpose() << "\n\n";
-  }
+//  kf4::KalmanFilter<systems::AnotherSystem> kf_5;
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    kf_5.Predict(Q3);
+//    std::cout << "Predict: " << kf_5.GetState().transpose() << '\n';
+//    kf_5.Update(z3 * (double) i, R3);
+//    std::cout << "Measurement: " << (z3 * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << kf_5.GetState().transpose() << "\n\n";
+//  }
 
   ////////////////////////////////////////////////////////////////////
 
@@ -160,14 +170,15 @@ int main() {
 
   experimental::ekf1::ExtendedKalmanFilter<systems::SimpleSystem> ekf_1;
   ekf_1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    ekf_1.Predict(Q);
-    std::cout << "Predict: " << ekf_1.GetState().transpose() << '\n';
-    ekf_1.Update(z * (double) i, R);
-    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << ekf_1.GetState().transpose() << "\n\n";
-  }
+
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    ekf_1.Predict(Q);
+//    std::cout << "Predict: " << ekf_1.GetState().transpose() << '\n';
+//    ekf_1.Update(z * (double) i, R);
+//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+//    std::cout << "Update: " << ekf_1.GetState().transpose() << "\n\n";
+//  }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "EKF 1 (with non-linear system) \n";
@@ -176,17 +187,15 @@ int main() {
   systems::NonLinearSystem::ProcessNoise Q_nl = systems::NonLinearSystem::ProcessNoise::Identity() * 10.0;
   systems::NonLinearSystem::MeasurementNoise R_nl = systems::NonLinearSystem::MeasurementNoise::Identity() * 1.0;
 
-//  systems::NonLinearSystem::MeasurementVector z_nl =
-
   ekf_2.SetCov(Q_nl);
-  for (int i = 0; i < iterations; i++) {
-    std::cout << "Iteration: " << i << '\n';
-    ekf_2.Predict(Q_nl);
-    std::cout << "Predict: " << ekf_2.GetState().transpose() << '\n';
-    ekf_2.Update(z, R_nl);
-    std::cout << "Measurement: " << z.transpose() << "\n";
-    std::cout << "Update: " << ekf_2.GetState().transpose() << "\n\n";
-  }
+//  for (int i = 0; i < iterations; i++) {
+//    std::cout << "Iteration: " << i << '\n';
+//    ekf_2.Predict(Q_nl);
+//    std::cout << "Predict: " << ekf_2.GetState().transpose() << '\n';
+//    ekf_2.Update(z, R_nl);
+//    std::cout << "Measurement: " << z.transpose() << "\n";
+//    std::cout << "Update: " << ekf_2.GetState().transpose() << "\n\n";
+//  }
 
  // velocity is estimated correctly after a few iterations
  // why doesn't heading work out?
@@ -195,15 +204,19 @@ int main() {
   std::cout << "Unscented kalman filter 1\n";
 
   experimental::ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
-  ukf_1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  ukf_1.SetCov(Eigen::Matrix4d::Identity());
 
+  std::cout << ukf_1.GetState().transpose() << '\n';
+  std::cout << ukf_1.GetCov() << '\n';
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
     ukf_1.Predict(Q);
     std::cout << "Predict: " << ukf_1.GetState().transpose() << '\n';
+    std::cout << ukf_1.GetCov() << '\n';
     ukf_1.Update(z * (double) i, R);
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-    std::cout << "Update: " << ukf_1.GetState().transpose() << "\n\n";
+    std::cout << "Update: " << ukf_1.GetState().transpose() << "\n";
+    std::cout << ukf_1.GetCov() << "\n\n";
   }
 
 

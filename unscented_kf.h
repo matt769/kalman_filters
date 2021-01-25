@@ -14,6 +14,12 @@
 #include "state.h"
 #include "system.h"
 
+// References
+// https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
+// https://github.com/koide3/hdl_localization/blob/master/include/kkl/alg/unscented_kalman_filter.hpp
+// https://www3.nd.edu/~lemmon/courses/ee67033/pubs/julier-ukf-tac-2000.pdf
+
+
 namespace experimental {
 namespace ukf1 {
 
@@ -33,27 +39,57 @@ class UnscentedKalmanFilter {
     const StateSizeMatrix& Q = process_noise;
 
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
-
+//    std::cout << SP << "\n\n";
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP; // transformed sigma points
     for (size_t idx = 0; idx < kNumSigma; ++idx) {
       TSP.row(idx) = System::processModel(SP.row(idx));
     }
+//    std::cout << TSP << "\n\n";
 
     state_.x = TSP.transpose() * W; // (weighted) mean of transformed sigma points
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP_minus_mean = TSP.rowwise() - state_.x.transpose();
-    state_.P = TSP_minus_mean.transpose() * TSP_minus_mean;
-    // find nicer way to do this? possibly using array operations
-    for (size_t idx = 0; idx < System::kStateSize; ++idx) {
-      state_.P.row(idx) *= W(idx); // will this apply weights in the way I want or will I need to do before the mult above??
-    }
-    state_.P += Q;
-    // giving non-zero outputs for the first prediction
+    state_.P = Q + TSP_minus_mean.transpose() * (TSP_minus_mean.array().colwise() * W.array()).matrix();
+
+    // Possibly a more readable version that the above
+    //    state_.P.setZero();
+    //    for (size_t idx = 0; idx < kNumSigma; ++idx) {
+    //      state_.P += W(idx) * TSP_minus_mean.row(idx).transpose() * TSP_minus_mean.row(idx);
+    //    }
+    //    state_.P += Q;
   };
 
   void Update(const MeasurementSizeVector& measurement,
               const MeasurementSizeMatrix& measurement_noise) {
     const MeasurementSizeMatrix& R = measurement_noise;
 
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
+    Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP; // transformed sigma points
+    for (size_t idx = 0; idx < kNumSigma; ++idx) {
+      TSP.row(idx) = System::measurementModel(SP.row(idx));
+    }
+
+    MeasurementSizeVector z_hat = TSP.transpose() * W; // (weighted) mean of transformed sigma points (sampled predicted measurements)
+    Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP_minus_measurement = TSP.rowwise() - measurement.transpose();
+    MeasurementSizeMatrix S = R + TSP_minus_measurement.transpose() * (TSP_minus_measurement.array().colwise() * W.array()).matrix();
+
+    // Now calculate the cross-covariance between sigma point in state space, and sigma points in measurement space
+    // Call this PHt because it's equivalent to P * H' in the standard equation K = P * H' * inv(S)
+    Eigen::Matrix<double, kNumSigma, System::kStateSize> SP_minus_mean = SP.rowwise() - state_.x.transpose();
+    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> PHt = SP_minus_mean.transpose() * (TSP_minus_measurement.array().colwise() * W.array()).matrix();
+
+    // Kalman gain
+    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = PHt * S.inverse();
+    std::cout << K << "\n\n";
+    std::cout << (measurement - z_hat).transpose() << "\n\n";
+
+    // K looks wrong in second iteration
+
+
+    // Update state
+    state_.x += K * (measurement - z_hat);
+//    state_.P = (StateSizeMatrix::Identity() - K * PHt) * state_.P;
+//    std::cout << state_.P << "\n\n";
+    state_.P = state_.P - K * S * K.transpose();
 
 //    MeasurementSizeVector z_hat = System::measurementModel(state_.x);
 //    MeasurementSizeVector y = measurement - z_hat;
@@ -78,7 +114,7 @@ class UnscentedKalmanFilter {
     W(0) = lambda / (System::kStateSize + lambda);
     for (size_t i = 1; i < kNumSigma; i++) {
       W(i) = 1.0 / (2 * (System::kStateSize + lambda));
-      W(i+1) = 1.0 / (2 * (System::kStateSize + lambda));
+      W(i + 1) = 1.0 / (2 * (System::kStateSize + lambda));
     }
   };
 
