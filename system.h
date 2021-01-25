@@ -15,6 +15,32 @@
 
 namespace systems {
 
+// state is p and v, 1 dimension
+class TestSystem {
+ public:
+  static constexpr size_t kStateSize = 2;
+  using StateVector = kf::State<kStateSize>::StateVector;
+  using StateMatrix = kf::State<kStateSize>::CovMatrix;
+
+  static StateVector processModel(const StateVector &x) {
+    StateMatrix F = StateMatrix::Identity();
+    F(0, 2) = 0.1; // p = p + v*dt
+    return F * x;
+  };
+
+  static constexpr size_t kMeasurementSize = 1;
+  using MeasurementVector = Eigen::Matrix<double, kMeasurementSize, 1>;
+  using MeasurementNoise =
+  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+
+  static MeasurementVector measurementModel(const StateVector &x) {
+    Eigen::Matrix<double, 2, 4> H = Eigen::Matrix<double, 2, 4>::Zero();
+    // Measure position only
+    H(0, 0) = 1.0;
+    return H * x;
+  };
+};
+
 class SimpleSystem {
 public:
   static constexpr size_t kStateSize = 4;
