@@ -24,7 +24,7 @@ class TestSystem {
 
   static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
-    F(0, 2) = 0.1; // p = p + v*dt
+    F(0, 1) = 0.1; // p = p + v*dt
     return F * x;
   };
 
