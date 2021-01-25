@@ -7,4 +7,6 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-add_executable(simple_ukf main.cpp simple_kf.cpp)
+add_executable(kalman_filters main.cpp simple_kf.cpp)
+
+add_executable(rough rough.cpp)
