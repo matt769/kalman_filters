@@ -34,7 +34,7 @@ class TestSystem {
   Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
 
   static MeasurementVector measurementModel(const StateVector &x) {
-    Eigen::Matrix<double, 2, 4> H = Eigen::Matrix<double, 2, 4>::Zero();
+    Eigen::Matrix<double, kMeasurementSize, kStateSize> H = Eigen::Matrix<double, kMeasurementSize, kStateSize>::Zero();
     // Measure position only
     H(0, 0) = 1.0;
     return H * x;
@@ -60,7 +60,7 @@ public:
       Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
 
   static MeasurementVector measurementModel(const StateVector &x) {
-    Eigen::Matrix<double, 2, 4> H = Eigen::Matrix<double, 2, 4>::Zero();
+    Eigen::Matrix<double, kMeasurementSize, kStateSize> H = Eigen::Matrix<double, kMeasurementSize, kStateSize>::Zero();
     // Measure position only
     H(0, 0) = 1.0;
     H(1, 1) = 1.0;
