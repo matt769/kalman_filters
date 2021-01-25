@@ -251,6 +251,10 @@ public:
     MeasurementSizeMatrix S = H_ * state_.P * H_.transpose() + R;
     Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = state_.P * H_.transpose() * S.inverse();
 
+    std::cout << "S\n" << S << "\n\n";
+    std::cout << "K\n" <<  K << "\n\n";
+    std::cout << "y\n" <<  (measurement - z_hat).transpose() << "\n\n";
+
     state_.x = state_.x + K * y;
     state_.P = (StateSizeMatrix::Identity() - K * H_) * state_.P;
   };
