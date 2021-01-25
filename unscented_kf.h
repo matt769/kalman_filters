@@ -15,9 +15,11 @@
 #include "system.h"
 
 // References
+// https://www3.nd.edu/~lemmon/courses/ee67033/pubs/julier-ukf-tac-2000.pdf
+// https://www.youtube.com/watch?t=24m27s&v=DWDzmweTKsQ&feature=youtu.be
 // https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
 // https://github.com/koide3/hdl_localization/blob/master/include/kkl/alg/unscented_kalman_filter.hpp
-// https://www3.nd.edu/~lemmon/courses/ee67033/pubs/julier-ukf-tac-2000.pdf
+
 
 
 namespace experimental {
