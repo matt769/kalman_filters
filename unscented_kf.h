@@ -120,7 +120,7 @@ class UnscentedKalmanFilter {
 
 };
 
-} // namespace ekf1
+} // namespace ukf1
 } // namespace experimental
 
 // 1. A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators, Julier, Uhlman, Durrant-Whyte
