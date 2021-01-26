@@ -16,18 +16,21 @@ Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
 
 int main() {
 
-  const int iterations = 2;
-  Eigen::Matrix<double, 1, 1> z;
-  z(0) = 2.0;
+  const int iterations = 10;
+//  Eigen::Matrix<double, 1, 1> z;
+//  z(0) = 2.0;
+  systems::SimpleSystem::MeasurementVector z;
+  z(0) = 1.0;
+  z(1) = 2.0;
 
-  Eigen::Matrix2d Q = Eigen::Matrix2d::Identity() * 2.0;
-  Eigen::Matrix<double, 1, 1> R = Eigen::Matrix<double, 1, 1>::Identity();
+  systems::SimpleSystem::ProcessNoise Q = systems::SimpleSystem::ProcessNoise::Identity() * 2.0;
+  systems::SimpleSystem::MeasurementNoise R = systems::SimpleSystem::MeasurementNoise::Identity();
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 4\n";
 
-  kf4::KalmanFilter<systems::TestSystem> kf;
-  kf.SetCov(Eigen::Matrix2d::Identity());
+  kf4::KalmanFilter<systems::SimpleSystem> kf;
+  kf.SetCov(systems::SimpleSystem::StateMatrix::Identity());
   std::cout << "Intial state:\n";
   std::cout << kf.GetState().transpose() << "\n\n";
   std::cout << kf.GetCov() << "\n\n";
@@ -35,18 +38,18 @@ int main() {
     std::cout << "Iteration: " << i << "\n\n";
     kf.Predict(Q);
     std::cout << "Predict: " << kf.GetState().transpose() << "\n\n";
-    std::cout << kf.GetCov() << "\n\n";
+//    std::cout << kf.GetCov() << "\n\n";
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n\n";
     kf.Update(z * (double) i, R);
     std::cout << "Update: " << kf.GetState().transpose() << "\n\n";
-    std::cout << kf.GetCov() << "\n\n";
+//    std::cout << kf.GetCov() << "\n\n";
   }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Unscented kalman filter 1\n";
 
-  experimental::ukf1::UnscentedKalmanFilter<systems::TestSystem> ukf_1;
-  ukf_1.SetCov(Eigen::Matrix2d::Identity());
+  experimental::ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
+  ukf_1.SetCov(systems::SimpleSystem::StateMatrix::Identity());
 
   std::cout << ukf_1.GetState().transpose() << "\n\n";
   std::cout << ukf_1.GetCov() << "\n\n";
@@ -54,11 +57,11 @@ int main() {
     std::cout << "Iteration: " << i << "\n\n";
     ukf_1.Predict(Q);
     std::cout << "Predict: " << ukf_1.GetState().transpose() << "\n\n";
-    std::cout << ukf_1.GetCov() << "\n\n";
+//    std::cout << ukf_1.GetCov() << "\n\n";
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n\n";
     ukf_1.Update(z * (double) i, R);
     std::cout << "Update: " << ukf_1.GetState().transpose() << "\n\n";
-    std::cout << ukf_1.GetCov() << "\n\n";
+//    std::cout << ukf_1.GetCov() << "\n\n";
   }
 
 

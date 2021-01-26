@@ -41,12 +41,10 @@ class UnscentedKalmanFilter {
     const StateSizeMatrix& Q = process_noise;
 
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
-//    std::cout << SP << "\n\n";
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP; // transformed sigma points
     for (size_t idx = 0; idx < kNumSigma; ++idx) {
       TSP.row(idx) = System::processModel(SP.row(idx).transpose()).transpose();
     }
-//    std::cout << TSP << "\n\n";
 
     state_.x = TSP.transpose() * W; // (weighted) mean of transformed sigma points
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP_minus_mean = TSP.rowwise() - state_.x.transpose();
@@ -64,53 +62,15 @@ class UnscentedKalmanFilter {
               const MeasurementSizeMatrix& measurement_noise) {
     const MeasurementSizeMatrix& R = measurement_noise;
 
-    // try copying koide version to see where differences are
-
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP = CalculateSigmaPoints();
     Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP; // transformed sigma points
     for (size_t idx = 0; idx < kNumSigma; ++idx) {
       TSP.row(idx) = System::measurementModel(SP.row(idx).transpose()).transpose();
     }
 
-    std::cout << "SP\n" << SP << "\n\n";
-    std::cout << "TSP\n" << TSP << "\n\n";
-
     MeasurementSizeVector z_hat = TSP.transpose() * W; // (weighted) mean of transformed sigma points (sampled predicted measurements)
     Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP_minus_pred_meas = TSP.rowwise() - z_hat.transpose();
     MeasurementSizeMatrix S = R + TSP_minus_pred_meas.transpose() * (TSP_minus_pred_meas.array().colwise() * W.array()).matrix();
-
-    std::cout << "W\n" << W.transpose() << "\n\n";
-    std::cout << "TSP_minus_pred_meas\n" << TSP_minus_pred_meas << "\n\n";
-
-    // try koide
-//    Eigen::VectorXd expected_measurement_mean = Eigen::VectorXd::Zero(System::kMeasurementSize);
-//    for (int i = 0; i < kNumSigma; i++) {
-//      expected_measurement_mean += W[i] * TSP.row(i);
-//    }
-    Eigen::VectorXd expected_measurement_cov = Eigen::VectorXd::Zero(System::kMeasurementSize, System::kMeasurementSize);
-    for (int i = 0; i < kNumSigma; i++) {
-      Eigen::VectorXd diff = TSP.row(i).transpose() - z_hat; // - expected_measurement_mean
-      std::cout << diff << '\n';
-//      Eigen::VectorXd diff = TSP_minus_measurement.row(i);
-      expected_measurement_cov += W[i] * diff * diff.transpose();
-
-    }
-    std::cout << "\n\n";
-
-    expected_measurement_cov += R;
-
-//    std::cout << "expected_measurement_mean\n" << expected_measurement_mean.transpose() << "\n\n";
-    std::cout << "expected_measurement_cov\n" << expected_measurement_cov << "\n\n";
-
-
-
-//    MeasurementSizeMatrix S_alt;
-//    S_alt.setZero();
-//    for (size_t i = 0; i < kNumSigma; ++i) {
-//      S_alt += W(i) * TSP_minus_measurement.row(i).transpose() * TSP_minus_measurement.row(i);
-//    }
-//    S_alt += R;
-//    std::cout << "S_alt\n" << S << "\n\n";
 
     // Now calculate the cross-covariance between sigma point in state space, and sigma points in measurement space
     // Call this PHt because it's equivalent to P * H' in the standard equation K = P * H' * inv(S)
@@ -120,26 +80,9 @@ class UnscentedKalmanFilter {
     // Kalman gain
     Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = PHt * S.inverse();
 
-    std::cout << "z_hat\n" << z_hat << "\n\n";
-    std::cout << "S\n" << S << "\n\n";
-    std::cout << "K\n" <<  K << "\n\n";
-    std::cout << "y\n" <<  (measurement - z_hat).transpose() << "\n\n";
-
-    // K looks wrong in second iteration
-
-
     // Update state
     state_.x += K * (measurement - z_hat);
-//    state_.P = (StateSizeMatrix::Identity() - K * PHt) * state_.P;
-//    std::cout << state_.P << "\n\n";
     state_.P = state_.P - K * S * K.transpose();
-
-//    MeasurementSizeVector z_hat = System::measurementModel(state_.x);
-//    MeasurementSizeVector y = measurement - z_hat;
-//    MeasurementSizeMatrix S = JH * state_.P * JH.transpose() + R;
-//    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = state_.P * JH.transpose() * S.inverse();
-//    state_.x = state_.x + K * y;
-//    state_.P = (StateSizeMatrix::Identity() - K * JH) * state_.P;
   };
 
   StateSizeVector GetState() const { return state_.x; };
@@ -165,19 +108,12 @@ class UnscentedKalmanFilter {
     Eigen::LLT<StateSizeMatrix> llt_of_P_mod(P_mod);
     StateSizeMatrix L = llt_of_P_mod.matrixL();
 
-    std::cout << P_mod << "\n\n";
-    std::cout << L << "\n\n";
-    std::cout << L * L.transpose() << "\n\n";
-
-
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SigmaPoints;
     SigmaPoints.row(0) = state_.x;
     for (size_t idx = 0; idx < System::kStateSize; ++idx) {
-      std::cout << idx << ": " << L.col(idx).transpose() << '\n';
       // "for a root of the form P=LL', the columns of L are used." [1] (as opposed to P=L'L)
       SigmaPoints.row(2 * idx + 1) = (state_.x + L.col(idx)).transpose();
       SigmaPoints.row(2 * idx + 1 + 1) = (state_.x - L.col(idx)).transpose();
-      std::cout << '\n';
     }
     return SigmaPoints;
   }

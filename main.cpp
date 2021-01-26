@@ -19,7 +19,7 @@ Eigen::Matrix<double, 4, 1> Process(const Eigen::Matrix<double, 4, 1>& x) {
 
 int main() {
 
-  const int iterations = 2;
+  const int iterations = 3;
   const Eigen::Vector2d z(1.0, 2.0);
 
   ////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ int main() {
   std::cout << "Unscented kalman filter 1\n";
 
   experimental::ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
-  ukf_1.SetCov(Eigen::Matrix4d::Identity());
+  ukf_1.SetCov(systems::SimpleSystem::StateMatrix::Identity());
 
   std::cout << ukf_1.GetState().transpose() << '\n';
   std::cout << ukf_1.GetCov() << '\n';

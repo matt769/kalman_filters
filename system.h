@@ -46,6 +46,7 @@ public:
   static constexpr size_t kStateSize = 4;
   using StateVector = kf::State<kStateSize>::StateVector;
   using StateMatrix = kf::State<kStateSize>::CovMatrix;
+  using ProcessNoise = Eigen::Matrix<double, kStateSize, kStateSize>;
 
   static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
