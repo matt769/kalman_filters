@@ -19,8 +19,9 @@ namespace systems {
 class TestSystem {
  public:
   static constexpr size_t kStateSize = 2;
-  using StateVector = kf::State<kStateSize>::StateVector;
-  using StateMatrix = kf::State<kStateSize>::CovMatrix;
+  using StateVector = Eigen::Matrix<double, kStateSize, 1>;
+  using StateMatrix = Eigen::Matrix<double, kStateSize, kStateSize>;
+  using ProcessNoiseMatrix = StateMatrix;
 
   static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
@@ -44,9 +45,9 @@ class TestSystem {
 class SimpleSystem {
 public:
   static constexpr size_t kStateSize = 4;
-  using StateVector = kf::State<kStateSize>::StateVector;
-  using StateMatrix = kf::State<kStateSize>::CovMatrix;
-  using ProcessNoise = Eigen::Matrix<double, kStateSize, kStateSize>;
+  using StateVector = Eigen::Matrix<double, kStateSize, 1>;
+  using StateMatrix = Eigen::Matrix<double, kStateSize, kStateSize>;
+  using ProcessNoiseMatrix = StateMatrix;
 
   static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
@@ -57,8 +58,8 @@ public:
 
   static constexpr size_t kMeasurementSize = 2;
   using MeasurementVector = Eigen::Matrix<double, kMeasurementSize, 1>;
-  using MeasurementNoise =
-      Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementMatrix = Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementNoiseMatrix = MeasurementMatrix;
 
   static MeasurementVector measurementModel(const StateVector &x) {
     Eigen::Matrix<double, kMeasurementSize, kStateSize> H = Eigen::Matrix<double, kMeasurementSize, kStateSize>::Zero();
@@ -72,8 +73,9 @@ public:
 class AnotherSystem {
 public:
   static constexpr size_t kStateSize = 6;
-  using StateVector = kf::State<kStateSize>::StateVector;
-  using StateMatrix = kf::State<kStateSize>::CovMatrix;
+  using StateVector = Eigen::Matrix<double, kStateSize, 1>;
+  using StateMatrix = Eigen::Matrix<double, kStateSize, kStateSize>;
+  using ProcessNoiseMatrix = StateMatrix;
 
   static StateVector processModel(const StateVector &x) {
     StateMatrix F = StateMatrix::Identity();
@@ -85,8 +87,8 @@ public:
 
   static constexpr size_t kMeasurementSize = 3;
   using MeasurementVector = Eigen::Matrix<double, kMeasurementSize, 1>;
-  using MeasurementNoise =
-  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementMatrix = Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementNoiseMatrix = MeasurementMatrix;
 
   static MeasurementVector measurementModel(const StateVector &x) {
     Eigen::Matrix<double, kMeasurementSize, kStateSize> H = Eigen::Matrix<double, kMeasurementSize, kStateSize>::Zero();
@@ -107,9 +109,9 @@ public:
 class NonLinearSystem {
  public:
   static constexpr size_t kStateSize = 4;
-  using StateVector = kf::State<kStateSize>::StateVector;
-  using StateMatrix = kf::State<kStateSize>::CovMatrix;
-  using ProcessNoise = kf::State<kStateSize>::CovMatrix;
+  using StateVector = Eigen::Matrix<double, kStateSize, 1>;
+  using StateMatrix = Eigen::Matrix<double, kStateSize, kStateSize>;
+  using ProcessNoiseMatrix = StateMatrix;
 
   static StateVector processModel(const StateVector &x) {
     const double& px = x(0);
@@ -130,8 +132,8 @@ class NonLinearSystem {
 
   static constexpr size_t kMeasurementSize = 2;
   using MeasurementVector = Eigen::Matrix<double, kMeasurementSize, 1>;
-  using MeasurementNoise =
-  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementMatrix = Eigen::Matrix<double, kMeasurementSize, kMeasurementSize>;
+  using MeasurementNoiseMatrix = MeasurementMatrix;
 
   static MeasurementVector measurementModel(const StateVector &x) {
     MeasurementVector predicted_measurement;

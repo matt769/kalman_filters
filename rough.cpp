@@ -23,8 +23,8 @@ int main() {
   z(0) = 1.0;
   z(1) = 2.0;
 
-  systems::SimpleSystem::ProcessNoise Q = systems::SimpleSystem::ProcessNoise::Identity() * 2.0;
-  systems::SimpleSystem::MeasurementNoise R = systems::SimpleSystem::MeasurementNoise::Identity();
+  systems::SimpleSystem::ProcessNoiseMatrix Q = systems::SimpleSystem::ProcessNoiseMatrix::Identity() * 2.0;
+  systems::SimpleSystem::MeasurementNoiseMatrix R = systems::SimpleSystem::MeasurementNoiseMatrix::Identity();
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 4\n";
