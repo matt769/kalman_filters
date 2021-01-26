@@ -97,9 +97,9 @@ class UnscentedKalmanFilter {
   static constexpr double lambda = 1.0; // TODO review
 
   void CalculateWeights() {
-    double w = 1.0 / (2.0 * (System::kStateSize + lambda)); // all weights except w0
+    double w = 1.0 / (2.0 * (static_cast<double>(System::kStateSize) + lambda)); // all weights except w0
     W.setConstant(w);
-    W(0) = lambda / (System::kStateSize + lambda);
+    W(0) = lambda / (static_cast<double>(System::kStateSize) + lambda);
   };
 
   Eigen::Matrix<double, kNumSigma, System::kStateSize> CalculateSigmaPoints() const {
