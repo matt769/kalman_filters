@@ -48,14 +48,7 @@ class UnscentedKalmanFilter {
 
     state_.x = TSP.transpose() * W; // (weighted) mean of transformed sigma points
     Eigen::Matrix<double, kNumSigma, System::kStateSize> TSP_minus_mean = TSP.rowwise() - state_.x.transpose();
-    state_.P = Q + TSP_minus_mean.transpose() * (TSP_minus_mean.array().colwise() * W.array()).matrix();
-
-    // Possibly a more readable version that the above
-    //    state_.P.setZero();
-    //    for (size_t idx = 0; idx < kNumSigma; ++idx) {
-    //      state_.P += W(idx) * TSP_minus_mean.row(idx).transpose() * TSP_minus_mean.row(idx);
-    //    }
-    //    state_.P += Q;
+    state_.P = Q + TSP_minus_mean.transpose() * W.asDiagonal() * TSP_minus_mean;
   };
 
   void Update(const MeasurementSizeVector& measurement,
@@ -70,12 +63,12 @@ class UnscentedKalmanFilter {
 
     MeasurementSizeVector z_hat = TSP.transpose() * W; // (weighted) mean of transformed sigma points (sampled predicted measurements)
     Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP_minus_pred_meas = TSP.rowwise() - z_hat.transpose();
-    MeasurementSizeMatrix S = R + TSP_minus_pred_meas.transpose() * (TSP_minus_pred_meas.array().colwise() * W.array()).matrix();
+    MeasurementSizeMatrix S = R + TSP_minus_pred_meas.transpose() * W.asDiagonal() * TSP_minus_pred_meas;
 
     // Now calculate the cross-covariance between sigma point in state space, and sigma points in measurement space
     // Call this PHt because it's equivalent to P * H' in the standard equation K = P * H' * inv(S)
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP_minus_mean = SP.rowwise() - state_.x.transpose();
-    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> PHt = SP_minus_mean.transpose() * (TSP_minus_pred_meas.array().colwise() * W.array()).matrix();
+    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> PHt = SP_minus_mean.transpose() * W.asDiagonal() * TSP_minus_pred_meas;
 
     // Kalman gain
     Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = PHt * S.inverse();
