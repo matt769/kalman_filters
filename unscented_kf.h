@@ -76,25 +76,30 @@ class UnscentedKalmanFilter {
     std::cout << "TSP\n" << TSP << "\n\n";
 
     MeasurementSizeVector z_hat = TSP.transpose() * W; // (weighted) mean of transformed sigma points (sampled predicted measurements)
-    Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP_minus_measurement = TSP.rowwise() - measurement.transpose();
-    MeasurementSizeMatrix S = R + TSP_minus_measurement.transpose() * (TSP_minus_measurement.array().colwise() * W.array()).matrix();
+    Eigen::Matrix<double, kNumSigma, System::kMeasurementSize> TSP_minus_pred_meas = TSP.rowwise() - z_hat.transpose();
+    MeasurementSizeMatrix S = R + TSP_minus_pred_meas.transpose() * (TSP_minus_pred_meas.array().colwise() * W.array()).matrix();
 
     std::cout << "W\n" << W.transpose() << "\n\n";
-    std::cout << "TSP_minus_measurement\n" << TSP_minus_measurement << "\n\n";
+    std::cout << "TSP_minus_pred_meas\n" << TSP_minus_pred_meas << "\n\n";
 
     // try koide
-    Eigen::VectorXd expected_measurement_mean = Eigen::VectorXd::Zero(System::kMeasurementSize);
-    for (int i = 0; i < kNumSigma; i++) {
-      expected_measurement_mean += W[i] * TSP.row(i);
-    }
+//    Eigen::VectorXd expected_measurement_mean = Eigen::VectorXd::Zero(System::kMeasurementSize);
+//    for (int i = 0; i < kNumSigma; i++) {
+//      expected_measurement_mean += W[i] * TSP.row(i);
+//    }
     Eigen::VectorXd expected_measurement_cov = Eigen::VectorXd::Zero(System::kMeasurementSize, System::kMeasurementSize);
     for (int i = 0; i < kNumSigma; i++) {
-      Eigen::VectorXd diff = TSP.row(i).transpose() - expected_measurement_mean;
+      Eigen::VectorXd diff = TSP.row(i).transpose() - z_hat; // - expected_measurement_mean
+      std::cout << diff << '\n';
+//      Eigen::VectorXd diff = TSP_minus_measurement.row(i);
       expected_measurement_cov += W[i] * diff * diff.transpose();
+
     }
+    std::cout << "\n\n";
+
     expected_measurement_cov += R;
 
-    std::cout << "expected_measurement_mean\n" << expected_measurement_mean.transpose() << "\n\n";
+//    std::cout << "expected_measurement_mean\n" << expected_measurement_mean.transpose() << "\n\n";
     std::cout << "expected_measurement_cov\n" << expected_measurement_cov << "\n\n";
 
 
@@ -110,7 +115,7 @@ class UnscentedKalmanFilter {
     // Now calculate the cross-covariance between sigma point in state space, and sigma points in measurement space
     // Call this PHt because it's equivalent to P * H' in the standard equation K = P * H' * inv(S)
     Eigen::Matrix<double, kNumSigma, System::kStateSize> SP_minus_mean = SP.rowwise() - state_.x.transpose();
-    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> PHt = SP_minus_mean.transpose() * (TSP_minus_measurement.array().colwise() * W.array()).matrix();
+    Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> PHt = SP_minus_mean.transpose() * (TSP_minus_pred_meas.array().colwise() * W.array()).matrix();
 
     // Kalman gain
     Eigen::Matrix<double, System::kStateSize, System::kMeasurementSize> K = PHt * S.inverse();
