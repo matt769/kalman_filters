@@ -12,10 +12,10 @@
 
 namespace numeric_differentiation {
 
-// WHY ISNT SQRT CONSTEXPR ?? :(
-// constexpr double getEpsilon() {
-//  return std::sqrt(std::numeric_limits<double>::epsilon);
-//};
+// sqrt isn't constexpr :(
+constexpr double getEpsilon() {
+  return std::sqrt(std::numeric_limits<double>::epsilon());
+};
 
 template <size_t num_params, size_t num_outputs>
 Eigen::Matrix<double, num_outputs, num_params>
@@ -24,7 +24,7 @@ CalculateJacobian(const Eigen::Matrix<double, num_params, 1> &in,
                       const Eigen::Matrix<double, num_params, 1> &)>
                       f) {
   Eigen::Matrix<double, num_outputs, num_params> J;
-  const double e = 0.000000001; // TODO get proper epsilon
+  const double e = getEpsilon();
   // perturb input and measure change in function output
   for (size_t idx = 0; idx < num_params; ++idx) {
     Eigen::Matrix<double, num_params, 1> ev =
