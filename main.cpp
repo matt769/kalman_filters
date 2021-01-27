@@ -55,23 +55,22 @@ int main() {
     return H * x;
   };
 
-//    kf1.SetState(Eigen::Vector4d(0.5,0.0,0.0,0.2));
-  kf1.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  kf1.SetCov(Eigen::Matrix4d::Identity());
   Eigen::Matrix4d Q = Eigen::Matrix4d::Identity() * 2.0;
   Eigen::Matrix2d R = Eigen::Matrix2d::Identity();
 
-//  std::cout << kf1.GetState().transpose() << '\n';
-//  std::cout << kf1.GetCov() << '\n';
-//  for (int i = 0; i < iterations; i++) {
-//    std::cout << "Iteration: " << i << '\n';
-//    kf1.Predict(process, Q);
-//    std::cout << "Predict: " << kf1.GetState().transpose() << '\n';
-//    std::cout << kf1.GetCov() << '\n';
-//    kf1.Update<2>(measurement_model, z * (double) i, R);
-//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-//    std::cout << "Update: " << kf1.GetState().transpose() << "\n\n";
-//    std::cout << kf1.GetCov() << '\n';
-//  }
+  std::cout << kf1.GetState().transpose() << '\n';
+  std::cout << kf1.GetCov() << '\n';
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf1.Predict(process, Q);
+    std::cout << "Predict: " << kf1.GetState().transpose() << '\n';
+    std::cout << kf1.GetCov() << '\n';
+    kf1.Update<2>(measurement_model, z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf1.GetState().transpose() << "\n\n";
+    std::cout << kf1.GetCov() << '\n';
+  }
 
   ////////////////////////////////////////////////////////////////////
 
@@ -94,22 +93,22 @@ int main() {
   };
 
   kf2::KalmanFilter<4, 2> kf2(process_model_2, measurement_model_2);
-  kf2.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  kf2.SetCov(Eigen::Matrix4d::Identity());
 
-//  for (int i = 0; i < iterations; i++) {
-//    std::cout << "Iteration: " << i << '\n';
-//    kf2.Predict(Q);
-//    std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
-//    kf2.Update(z * (double) i, R);
-//    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
-//    std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
-//  }
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf2.Predict(Q);
+    std::cout << "Predict: " << kf2.GetState().transpose() << '\n';
+    kf2.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf2.GetState().transpose() << "\n\n";
+  }
 
   ////////////////////////////////////////////////////////////////////
   std::cout << "Templated kalman filter 3\n";
 
   kf3::KalmanFilter<4, 2, SS> kf_3;
-  kf_3.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  kf_3.SetCov(Eigen::Matrix4d::Identity());
 
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
@@ -124,7 +123,7 @@ int main() {
   std::cout << "Templated kalman filter 4\n";
 
   kf4::KalmanFilter<SS> kf_4;
-  kf_4.SetCov(Eigen::Matrix4d::Identity() * 100.0);
+  kf_4.SetCov(Eigen::Matrix4d::Identity());
 
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
@@ -167,7 +166,7 @@ int main() {
   std::cout << "EKF 1 (with linear system) \n";
 
   experimental::ekf1::ExtendedKalmanFilter<SS> ekf_1;
-  ekf_1.SetCov(SS::StateMatrix::Identity() * 100.0);
+  ekf_1.SetCov(SS::StateMatrix::Identity());
 
   for (int i = 0; i < iterations; i++) {
     std::cout << "Iteration: " << i << '\n';
@@ -211,11 +210,9 @@ int main() {
     std::cout << "Iteration: " << i << '\n';
     ukf_1.Predict(Q);
     std::cout << "Predict: " << ukf_1.GetState().transpose() << '\n';
-    std::cout << ukf_1.GetCov() << '\n';
     ukf_1.Update(z * (double) i, R);
     std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
     std::cout << "Update: " << ukf_1.GetState().transpose() << "\n";
-    std::cout << ukf_1.GetCov() << "\n\n";
   }
 
 
