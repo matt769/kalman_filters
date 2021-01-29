@@ -152,6 +152,22 @@ int main() {
   }
 
   ////////////////////////////////////////////////////////////////////
+  std::cout << "Kalman filter using dynamic sized matrices\n";
+
+  Eigen::VectorXd starting_state = Eigen::VectorXd::Zero(4);
+  kf5::KalmanFilter<systems_dynamic::SimpleSystem> kf_6(starting_state);
+  kf_6.SetCov(Eigen::MatrixXd::Identity(4, 4));
+
+  for (int i = 0; i < iterations; i++) {
+    std::cout << "Iteration: " << i << '\n';
+    kf_6.Predict(Q);
+    std::cout << "Predict: " << kf_6.GetState().transpose() << '\n';
+    kf_6.Update(z * (double) i, R);
+    std::cout << "Measurement: " << (z * (double) i).transpose() << "\n";
+    std::cout << "Update: " << kf_6.GetState().transpose() << "\n\n";
+  }
+
+  ////////////////////////////////////////////////////////////////////
 
   Eigen::Vector4d current_state = Eigen::Vector4d::Zero();
 

@@ -275,5 +275,75 @@ private:
 
 } // namespace kf4
 
+namespace kf5 {
+
+template<typename System>
+class KalmanFilter {
+ public:
+  using StateVector = Eigen::VectorXd;
+  using StateMatrix = Eigen::MatrixXd;
+  using MeasurementVector = Eigen::VectorXd;
+  using MeasurementMatrix = Eigen::MatrixXd;
+
+  KalmanFilter(const StateVector& x)
+  : state_size_(x.size()), state_(x)
+  {
+
+    // Convert process model function into matrix
+    const StateMatrix IF = StateMatrix::Identity(state_size_, state_size_);
+    F_.resize(state_size_, state_size_);
+    for (size_t col_idx = 0; col_idx < state_size_; ++col_idx) {
+      F_.col(col_idx) = System::processModel(IF.col(col_idx));
+    }
+
+    // Convert measurement model function into matrix
+    const StateMatrix IH = StateMatrix::Identity(state_size_, state_size_);
+    H_.resize(System::kMeasurementSize, state_size_);
+    for (size_t col_idx = 0; col_idx < state_size_; ++col_idx) {
+      H_.col(col_idx) = System::measurementModel(IH.col(col_idx));
+    }
+  };
+
+  void Predict(const StateMatrix& process_noise) {
+    const StateMatrix& Q = process_noise;
+
+    state_.x = F_ * state_.x;
+    state_.P = F_ * state_.P * F_.transpose() + Q;
+  };
+
+  void Update(const MeasurementVector& measurement, const MeasurementMatrix& measurement_noise) {
+    const MeasurementMatrix& R = measurement_noise;
+    MeasurementVector z_hat = H_ * state_.x;
+    MeasurementVector y = measurement - z_hat;
+    MeasurementMatrix S = H_ * state_.P * H_.transpose() + R;
+    Eigen::MatrixXd K = state_.P * H_.transpose() * S.inverse();
+
+    state_.x = state_.x + K * y;
+    state_.P = (StateMatrix::Identity(state_size_, state_size_) - K * H_) * state_.P;
+  };
+
+  StateVector GetState() const {
+    return state_.x;
+  };
+  StateMatrix GetCov() const {
+    return state_.P;
+  };
+  void SetState(const StateVector& new_state) {
+    state_.x = new_state;
+  };
+  void SetCov(const StateMatrix& new_cov) {
+    state_.P = new_cov;
+  };
+
+ private:
+  size_t state_size_;
+  kf_dynamic::State state_;
+  StateMatrix F_; // process_model_ as matrix
+  Eigen::MatrixXd H_; // measurement_model_ as matrix
+};
+
+} // namespace kf5
+
+
 
 #endif //KALMAN_FILTERS_STANDARD_KF_H

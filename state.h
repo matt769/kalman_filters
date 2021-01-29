@@ -30,4 +30,22 @@ struct State {
 
 } // namespace kf
 
+namespace kf_dynamic {
+
+struct State {
+  using StateVector = Eigen::VectorXd;
+  using CovMatrix = Eigen::MatrixXd;
+
+  State(const StateVector& starting_state, const CovMatrix& starting_cov)
+      : x(starting_state), P(starting_cov) {}
+
+  State(const StateVector& starting_state)
+      : State(starting_state, CovMatrix::Identity(starting_state.rows(), starting_state.cols())) {}
+
+  StateVector x;
+  CovMatrix P;
+};
+
+} // namespace kf
+
 #endif //KALMAN_FILTERS_STATE_H

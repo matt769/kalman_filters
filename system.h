@@ -152,4 +152,37 @@ class NonLinearSystem {
 
 } // namespace systems
 
+namespace systems_dynamic {
+
+class SimpleSystem {
+ public:
+  static constexpr size_t kStateSize = 4;
+  using StateVector = Eigen::VectorXd;
+  using StateMatrix = Eigen::MatrixXd;
+  using ProcessNoiseMatrix = StateMatrix;
+
+  static StateVector processModel(const StateVector &x) {
+    Eigen::MatrixXd F = Eigen::MatrixXd::Identity(kStateSize, kStateSize);
+    F(0, 2) = 0.1; // px' = px + vx*dt
+    F(1, 3) = 0.1; // py' = py + vy*dt
+    return F * x;
+  };
+
+  static constexpr size_t kMeasurementSize = 2;
+  using MeasurementVector = Eigen::VectorXd;
+  using MeasurementMatrix = Eigen::MatrixXd;
+  using MeasurementNoiseMatrix = MeasurementMatrix;
+
+  static MeasurementVector measurementModel(const StateVector &x) {
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(kMeasurementSize, kStateSize);
+    // Measure position only
+    H(0, 0) = 1.0;
+    H(1, 1) = 1.0;
+    return H * x;
+  };
+};
+
+} // namespace systems_dynamic
+
+
 #endif // KALMAN_FILTERS_SYSTEM_H_
