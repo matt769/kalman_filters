@@ -8,5 +8,3 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_executable(kalman_filters main.cpp simple_kf.cpp)
-
-add_executable(rough rough.cpp)
