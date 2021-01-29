@@ -17,8 +17,8 @@ Assuming the system you created was called `MySystem` in the `systems` namespace
 For a standard KF
 ```c++
 kf4::KalmanFilter<systems::MySystem> kf;
-kf_4.Predict(Q); // where Q is the process noise
-kf_4.Update(z, R); // where z is the measurement, and R is the process measurement noise
+kf.Predict(Q); // where Q is the process noise
+kf.Update(z, R); // where z is the measurement, and R is the process measurement noise
 ```
 
 For an EKF and UKF it's basically the same
