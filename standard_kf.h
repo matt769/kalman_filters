@@ -414,7 +414,7 @@ class KalmanFilter {
 //  Eigen::MatrixXd H_; // measurement_model_ as matrix
 //};
 
-} // namespace kf6
+//} // namespace kf6
 
 
 

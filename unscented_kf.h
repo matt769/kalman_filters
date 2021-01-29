@@ -15,14 +15,12 @@
 #include "system.h"
 
 // References
-// https://www3.nd.edu/~lemmon/courses/ee67033/pubs/julier-ukf-tac-2000.pdf
-// https://www.youtube.com/watch?t=24m27s&v=DWDzmweTKsQ&feature=youtu.be
-// https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
-// https://github.com/koide3/hdl_localization/blob/master/include/kkl/alg/unscented_kalman_filter.hpp
+// 1. https://www3.nd.edu/~lemmon/courses/ee67033/pubs/julier-ukf-tac-2000.pdf
+// 2. https://www.youtube.com/watch?t=24m27s&v=DWDzmweTKsQ&feature=youtu.be
+// 3. https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
+// 4. https://github.com/koide3/hdl_localization/blob/master/include/kkl/alg/unscented_kalman_filter.hpp
 
 
-
-namespace experimental {
 namespace ukf1 {
 
 template<typename System>
@@ -114,8 +112,5 @@ class UnscentedKalmanFilter {
 };
 
 } // namespace ukf1
-} // namespace experimental
-
-// 1. A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators, Julier, Uhlman, Durrant-Whyte
 
 #endif //KALMAN_FILTERS_UNSCENTED_KF_H_

@@ -181,7 +181,7 @@ int main() {
   ////////////////////////////////////////////////////////////////////
   std::cout << "EKF 1 (with linear system) \n";
 
-  experimental::ekf1::ExtendedKalmanFilter<SS> ekf_1;
+  ekf1::ExtendedKalmanFilter<SS> ekf_1;
   ekf_1.SetCov(SS::StateMatrix::Identity());
 
   for (int i = 0; i < iterations; i++) {
@@ -197,7 +197,7 @@ int main() {
   std::cout << "EKF 1 (with non-linear system) \n";
 
   using NLS = systems::NonLinearSystem;
-  experimental::ekf1::ExtendedKalmanFilter<NLS> ekf_2;
+  ekf1::ExtendedKalmanFilter<NLS> ekf_2;
   NLS::ProcessNoiseMatrix Q_nl = NLS::ProcessNoiseMatrix::Identity() * 10.0;
   NLS::MeasurementNoiseMatrix R_nl = NLS::MeasurementNoiseMatrix::Identity() * 1.0;
 
@@ -217,7 +217,7 @@ int main() {
   ////////////////////////////////////////////////////////////////////
   std::cout << "Unscented kalman filter 1\n";
 
-  experimental::ukf1::UnscentedKalmanFilter<SS> ukf_1;
+  ukf1::UnscentedKalmanFilter<SS> ukf_1;
   ukf_1.SetCov(SS::StateMatrix::Identity());
 
   std::cout << ukf_1.GetState().transpose() << '\n';

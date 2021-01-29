@@ -14,7 +14,6 @@
 #include "system.h"
 #include "numeric_differentiation.h"
 
-namespace experimental {
 namespace ekf1 {
 
 template<typename System>
@@ -64,6 +63,5 @@ class ExtendedKalmanFilter {
 };
 
 } // namespace ekf1
-} // namespace experimental
 
 #endif // KALMAN_FILTERS_EXTENDED_KF_H_

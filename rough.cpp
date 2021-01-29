@@ -48,7 +48,7 @@ int main() {
   ////////////////////////////////////////////////////////////////////
   std::cout << "Unscented kalman filter 1\n";
 
-  experimental::ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
+  ukf1::UnscentedKalmanFilter<systems::SimpleSystem> ukf_1;
   ukf_1.SetCov(systems::SimpleSystem::StateMatrix::Identity());
 
   std::cout << ukf_1.GetState().transpose() << "\n\n";
